@@ -655,9 +655,9 @@
             bgAnimation: 'toystory',
             spinAnimation: 'toy_story',
             titleAnimation: 'shine',
-            buttonAnimation: 'ping',
             startButtonText: "START",
             boxThemeColor: '#FACC15',
+            boxBackgroundColor: '#2563EB', // 新增：中間抽獎區塊背景色預設為藍色
             customTextColor: "",
             customThemeColor: "",
             charge: {
@@ -1789,11 +1789,31 @@
                                         <div className="p-4 border-t border-gray-100 animate-fade-in bg-gray-50/50">
                                             <div className="mb-4"><label className="text-xs font-bold text-gray-500 mb-1 block">按鈕顯示文字</label><input type="text" value={settings.startButtonText} onChange={(e) => updateSettings({ startButtonText: e.target.value })} className="w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-red-500 outline-none bg-white" maxLength={10}/></div>
                                             <div className="mb-4">
-                                                <label className="text-xs font-bold text-gray-500 mb-2 block">抽獎框與跑馬燈顏色</label>
+                                                <label className="text-xs font-bold text-gray-500 mb-2 block">外框邊線顏色</label>
                                                 <div className="flex flex-wrap gap-2">
                                                     {BOX_THEME_COLORS.map((c) => (
                                                         <button key={c.id} onClick={() => { updateSettings({ boxThemeColor: c.value }); soundManager.playClick(settings.sound.click); }} className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${settings.boxThemeColor === c.value ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : 'border-transparent'}`} style={{ backgroundColor: c.value }} title={c.name}/>
                                                     ))}
+                                                </div>
+                                            </div>
+
+                                            {/* 新增：中間區塊背景顏色自訂 */}
+                                            <div className="mb-4">
+                                                <label className="text-xs font-bold text-gray-500 mb-2 block">中間抽獎區塊背景色</label>
+                                                <div className="flex items-center gap-3">
+                                                    <input 
+                                                        type="color" 
+                                                        value={settings.boxBackgroundColor || '#2563EB'} 
+                                                        onChange={(e) => updateSettings({ boxBackgroundColor: e.target.value })} 
+                                                        className="w-10 h-10 p-1 border rounded cursor-pointer bg-white"
+                                                    />
+                                                    <span className="text-sm font-mono text-gray-600">{settings.boxBackgroundColor || '#2563EB'}</span>
+                                                    <button 
+                                                        onClick={() => updateSettings({ boxBackgroundColor: '#2563EB' })} 
+                                                        className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm"
+                                                    >
+                                                        恢復預設
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -2280,8 +2300,8 @@
                         id: 'custom', name: '自訂主題',
                         primary: `bg-[${customThemeColor}]`, primaryHover: 'hover:opacity-90',
                         secondary: `bg-[${customThemeColor}]/10`, text: `text-[${customThemeColor}]`,
-                        border: `border-[${customThemeColor}]`, gradient: `from-[${customThemeColor}] to-gray-900`,
-                        gradientText: `from-[${customThemeColor}] to-white`, bgGradient: `from-gray-900 to-black`,
+                        border: `border-[${customThemeColor}]`, gradient: `from-[${customThemeColor}] to-[${customThemeColor}]`,
+                        gradientText: `from-[${customThemeColor}] to-[${customThemeColor}]`, bgGradient: `from-gray-900 to-black`,
                         cardBg: `bg-gray-900/80 border-[${customThemeColor}]/50 text-white`, boxBg: `bg-gray-900`
                     };
                 }
@@ -2668,7 +2688,7 @@
                             <div className="w-full bg-white rounded-3xl shadow-2xl overflow-hidden border-8 relative" style={{ borderColor: boxThemeColor }}>
                                 <div className={`absolute top-0 left-0 right-0 h-2 ${theme.primary} flex justify-between px-4`}>{[...Array(20)].map((_, i) => <div key={i} className={`w-2 h-2 rounded-full mt-1 ${i % 2 === 0 ? 'bg-yellow-300 animate-pulse' : 'bg-white'}`}></div>)}</div>
                                 
-                                <div className={`w-full h-64 md:h-80 shrink-0 flex items-center justify-center ${theme.boxBg} relative p-8 overflow-hidden`}>
+                                <div className={`w-full h-64 md:h-80 shrink-0 flex items-center justify-center relative p-8 overflow-hidden`} style={{ backgroundColor: settings.boxBackgroundColor || '#2563EB' }}>
                                 {currentPrize.drawn ? (
                                     <div className="text-center text-white">
                                     <Trophy className="w-20 h-20 mx-auto mb-4" style={{ color: boxThemeColor }} />
