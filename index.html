@@ -1273,31 +1273,43 @@
             };
 
             const handlePrizeImageUpload = async (e, id) => {
-                const file = e.target.files[0];
+                const target = e.target; // 確保取得 target 參考
+                const file = target.files[0];
                 if (file) {
                     if (file.size > 2 * 1024 * 1024) {
                         alert("無法上傳：圖片超過 2MB，請先壓縮後再試。");
+                        target.value = '';
                         return;
                     }
                     try {
                         const base64 = await fileToBase64(file);
                         updatePrizeField(id, 'image', base64);
-                    } catch (err) { console.error("Image convert failed", err); }
+                    } catch (err) { 
+                        console.error("Image convert failed", err); 
+                        alert("圖片處理失敗，請嘗試其他圖片。");
+                    }
                 }
+                target.value = ''; // 使用存下來的 target 清空
             };
             
             const handleBgUpload = async (e) => {
-                const file = e.target.files[0];
+                const target = e.target; // 確保取得 target 參考
+                const file = target.files[0];
                 if (file) {
                     if (file.size > 2 * 1024 * 1024) {
                         alert("無法上傳：背景圖超過 2MB，請先壓縮後再試。");
+                        target.value = '';
                         return;
                     }
                     try {
                         const base64 = await fileToBase64(file);
                         updateSettings({ backgroundImage: base64 });
-                    } catch (err) { console.error(err); }
+                    } catch (err) { 
+                        console.error(err); 
+                        alert("圖片處理失敗，請嘗試其他圖片。");
+                    }
                 }
+                target.value = ''; // 使用存下來的 target 清空
             };
 
             const handleDragStart = (index) => {
@@ -1799,7 +1811,6 @@
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="mb-2"><label className="text-xs font-bold text-gray-500 mb-1 block">按鈕待機動畫</label><select value={settings.buttonAnimation} onChange={(e) => { updateSettings({ buttonAnimation: e.target.value }); soundManager.playClick(settings.sound.click); }} className="w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-red-500 outline-none bg-white text-gray-700">{Object.values(BUTTON_ANIMATIONS).map((anim) => (<option key={anim.id} value={anim.id}>{anim.name}</option>))}</select></div>
                                         </div>
                                     )}
                                 </div>
@@ -2588,7 +2599,7 @@
                     <div className="p-4 border-t border-gray-200 bg-white grid grid-cols-2 gap-2"><button onClick={() => { setIsSettingsOpen(true); setSettingsTab('prizes'); soundManager.playClick(settings.sound.click); }} className="flex items-center justify-center gap-2 p-2 rounded text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"><Settings className="w-4 h-4" /> 設定</button><button onClick={() => { setIsDataModalOpen(true); soundManager.playClick(settings.sound.click); }} className="flex items-center justify-center gap-2 p-2 rounded text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"><Users className="w-4 h-4" /> 名單</button></div>
                 </div>
 
-                <div className={`flex-1 flex flex-col relative overflow-hidden ${backgroundImage ? 'bg-custom' : (bgAnimation === 'none' ? 'bg-gray-50' : bgAnimation === 'black' ? 'bg-black' : bgAnimation === 'aurora' ? 'bg-aurora' : bgAnimation === 'toystory' ? 'bg-toystory' : 'bg-gray-900')}`} style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}}>
+                <div className={`flex-1 flex flex-col relative overflow-hidden ${backgroundImage ? 'bg-custom' : (bgAnimation === 'none' ? 'bg-gray-50' : bgAnimation === 'black' ? 'bg-black' : bgAnimation === 'aurora' ? 'bg-aurora' : bgAnimation === 'toystory' ? 'bg-toystory' : 'bg-gray-900')}`} style={backgroundImage ? { backgroundImage: `url("${backgroundImage}")` } : {}}>
                     <div className={`absolute top-0 left-0 w-full h-full ${backgroundImage ? '' : (['none','black','aurora','toystory'].includes(bgAnimation) ? '' : `bg-gradient-to-b ${theme.bgGradient} opacity-90`)} z-0 pointer-events-none`}></div>
                     <button onClick={toggleFullscreen} className="absolute top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 shadow-sm" title={isFullscreen ? "退出全螢幕 (Esc)" : "進入全螢幕"}>{isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}</button>
                     {!isSidebarOpen && (<button onClick={() => setIsSidebarOpen(true)} className="absolute top-4 left-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 shadow-sm animate-fade-in" title="展開側邊欄"><Menu className="w-5 h-5" /></button>)}
