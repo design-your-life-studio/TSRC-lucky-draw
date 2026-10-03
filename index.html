@@ -778,10 +778,11 @@
         };
 
         const CHARGE_EFFECTS = {
-            flash: { id: 'flash', name: '閃光脈衝 (預設)', className: 'effect-flash' },
-            implode: { id: 'implode', name: '霓虹聚光 (四色)', className: 'effect-implode' }, 
+            flash: { id: 'flash', name: '閃光脈衝', className: 'effect-flash' },
+            implode: { id: 'implode', name: '霓虹聚光', className: 'effect-implode' }, 
             toystory: { id: 'toystory', name: '玩具總動員', className: 'effect-toystory' }, 
-            toystory_buzz: { id: 'toystory_buzz', name: '巴斯光年 (飛向宇宙)', className: 'effect-buzz' },
+            surprise_party: { id: 'surprise_party', name: '驚喜派對', className: 'effect-toystory' },
+            toystory_buzz: { id: 'toystory_buzz', name: '巴斯光年', className: 'effect-buzz' },
         };
 
         const BOX_THEME_COLORS = [
@@ -2734,9 +2735,10 @@
                 </div>
 
                 {isLongPressing && (
-                    <div className={`effect-charge-overlay ${!['toystory','toystory_buzz','implode'].includes(charge.type) ? (CHARGE_EFFECTS[charge.type]?.className || 'effect-flash') : ''} ${charge.type === 'toystory' ? 'effect-toystory' : ''} ${charge.type === 'toystory_buzz' ? 'effect-buzz' : ''} ${charge.type === 'implode' ? 'effect-implode' : ''}`} style={{ '--charge-scale': 1.0 + (charge.intensity / 100) * 1.5, top: `${effectPos.y + (charge.y - 50) * 4}px`, left: `${effectPos.x + (charge.x - 50) * 4}px` }}>
+                    <div className={`effect-charge-overlay ${!['toystory','surprise_party','toystory_buzz','implode'].includes(charge.type) ? (CHARGE_EFFECTS[charge.type]?.className || 'effect-flash') : ''} ${['toystory', 'surprise_party'].includes(charge.type) ? 'effect-toystory' : ''} ${charge.type === 'toystory_buzz' ? 'effect-buzz' : ''} ${charge.type === 'implode' ? 'effect-implode' : ''}`} style={{ '--charge-scale': 1.0 + (charge.intensity / 100) * 1.5, top: `${effectPos.y + (charge.y - 50) * 4}px`, left: `${effectPos.x + (charge.x - 50) * 4}px` }}>
                         {charge.type === 'implode' && (<><div className="implode-ring" style={{ width: '100%', height: '100%', animationDelay: '0s', borderColor: '#a855f7' }}></div><div className="implode-ring" style={{ width: '80%', height: '80%', animationDelay: '0.2s', borderColor: '#22c55e' }}></div><div className="implode-ring" style={{ width: '60%', height: '60%', animationDelay: '0.4s', borderColor: '#3b82f6' }}></div><div className="implode-ring" style={{ width: '40%', height: '40%', animationDelay: '0.6s', borderColor: '#ec4899' }}></div></>)}
                         {charge.type === 'toystory' && (<><div className="toy-rainbow-wrapper"><div className="toy-rainbow-rays"></div></div><div className="toy-badge-container"><div className="toy-badge-star"><Star size={80} className="text-red-500" fill="currentColor" /></div></div>{[...Array(8)].map((_, i) => { const toys = ['🚀', '🦖', '🥔', '👽', '🧸', '🐖', '🐶', '📦']; const angle = (i / 8) * Math.PI * 2; const dist = 300; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="toy-particle" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${i * 0.1}s` }}>{toys[i % toys.length]}</div>); })}</>)}
+                        {charge.type === 'surprise_party' && (<><div className="toy-rainbow-wrapper"><div className="toy-rainbow-rays"></div></div><div className="toy-badge-container"><div className="toy-badge-star"><img src="images/party-icon.png" className="w-[80px] h-[80px] object-contain" alt="party" /></div></div>{[...Array(8)].map((_, i) => { const images = ['images/party-01.png', 'images/party-02.png', 'images/party-03.png', 'images/party-04.png', 'images/party-05.png', 'images/party-06.png', 'images/party-07.png', 'images/party-08.png']; const angle = (i / 8) * Math.PI * 2; const dist = 300; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="toy-particle" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${i * 0.1}s` }}><img src={images[i]} className="w-[70px] h-[70px] object-contain" alt="particle" /></div>); })}</>)}
                         {charge.type === 'toystory_buzz' && (<div className="buzz-container"><div className="buzz-flying-group"><div className="buzz-jet-beam"></div><div className="buzz-wings"><div className="buzz-wing-left"><div className="buzz-wing-stripes"></div></div><div className="buzz-wing-right"><div className="buzz-wing-stripes"></div></div></div><div className="buzz-ring-purple"></div><div className="buzz-ring-green"></div><div className="buzz-core"><Star size={50} className="text-red-500 drop-shadow-sm" fill="#ef4444" /></div></div><div className="buzz-aftermath"><div className="buzz-smoke"></div>{[...Array(6)].map((_, i) => { const angle = (i / 6) * Math.PI * 2; const dist = 60 + Math.random() * 40; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="buzz-star" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${3.1 + Math.random() * 0.2}s` }}><Star size={20 + Math.random() * 15} fill="currentColor" /></div>); })}</div></div>)}
                     </div>
                 )}
