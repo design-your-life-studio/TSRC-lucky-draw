@@ -101,35 +101,6 @@
             to { transform: translateX(100vw); }
         }
 
-        /* 按鈕特效動畫 */
-        @keyframes btn-shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px) rotate(-5deg); }
-            75% { transform: translateX(5px) rotate(5deg); }
-        }
-        .animate-btn-shake { animation: btn-shake 2s infinite; }
-
-        @keyframes btn-rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .animate-btn-spin { animation: btn-rotate 8s linear infinite; }
-
-        @keyframes btn-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.5); transform: scale(1); }
-            50% { box-shadow: 0 0 60px rgba(255,215,0,1); transform: scale(1.05); }
-        }
-        .animate-btn-glow { animation: btn-glow 2s infinite; }
-
-        @keyframes btn-heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.1); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.1); }
-            70% { transform: scale(1); }
-        }
-        .animate-btn-pulse { animation: btn-heartbeat 3s infinite; }
-
         /* ----------------------------------------------------------- */
         /* --- 蓄力特效動畫定義區 (Charge Effects) --- */
         /* ----------------------------------------------------------- */
@@ -668,10 +639,10 @@
         import { createRoot } from 'https://esm.sh/react-dom@18.2.0/client';
         import { 
             Settings, Users, Gift, Trophy, Trash2, Plus, X, ChevronRight, ChevronDown, ChevronLeft,
-            Sparkles, Download, Image as ImageIcon, Upload, Search, 
+            Download, Image as ImageIcon, Upload, Search, 
             Paintbrush, Save, AlertTriangle, CheckCircle, Crown, UserX, 
             RefreshCw, MonitorPlay, Undo2, GripVertical, Maximize, Minimize,
-            PlayCircle, Zap, Menu, Move, Star, Layout, Volume2, VolumeX, Speaker, Crosshair, Pencil,
+            PlayCircle, Menu, Move, Star, Layout, Volume2, VolumeX, Crosshair, Pencil,
             History, Clock, FileText, RotateCcw
         } from 'https://esm.sh/lucide-react@0.292.0';
 
@@ -710,12 +681,48 @@
             }
         };
 
-        const fileToBase64 = (file) => {
+        // --- 取代原本的 fileToBase64，加入強大的自動圖片壓縮功能 ---
+        const processAndCompressImage = (file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) => {
             return new Promise((resolve, reject) => {
+                // 保留小型 GIF 動畫 (小於 3MB 不壓縮，避免動畫失效)
+                if (file.type === 'image/gif' && file.size < 3 * 1024 * 1024) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = (error) => reject(error);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        // 計算等比例縮放
+                        if (width > maxWidth || height > maxHeight) {
+                            const ratio = Math.min(maxWidth / width, maxHeight / height);
+                            width = Math.floor(width * ratio);
+                            height = Math.floor(height * ratio);
+                        }
+
+                        // 使用 Canvas 進行重繪與壓縮
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // 統一轉為 JPEG 確保最佳相容性與壓縮率
+                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve(dataUrl);
+                    };
+                    img.onerror = () => reject("圖片解析失敗");
+                };
+                reader.onerror = () => reject("檔案讀取失敗");
             });
         };
 
@@ -763,10 +770,6 @@
             scroll: { id: 'scroll', name: '直式跑馬燈 (預設)' },
             slot: { id: 'slot', name: '幸運老虎機' },
             toy_story: { id: 'toy_story', name: '玩具總動員' }
-        };
-
-        const BUTTON_ANIMATIONS = {
-            ping: { id: 'ping', name: '波紋擴散 (預設)' }
         };
 
         const TITLE_ANIMATIONS = {
@@ -1272,44 +1275,36 @@
                 setPrizes(prizes.filter(p => p.id !== id));
             };
 
+            // 使用新的圖片壓縮功能處理獎項圖片
             const handlePrizeImageUpload = async (e, id) => {
-                const target = e.target; // 確保取得 target 參考
-                const file = target.files[0];
-                if (file) {
-                    if (file.size > 2 * 1024 * 1024) {
-                        alert("無法上傳：圖片超過 2MB，請先壓縮後再試。");
-                        target.value = '';
-                        return;
-                    }
-                    try {
-                        const base64 = await fileToBase64(file);
-                        updatePrizeField(id, 'image', base64);
-                    } catch (err) { 
-                        console.error("Image convert failed", err); 
-                        alert("圖片處理失敗，請嘗試其他圖片。");
-                    }
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    // 獎品圖不需要太大，限制在 500x500
+                    const compressedBase64 = await processAndCompressImage(file, 500, 500, 0.8);
+                    updatePrizeField(id, 'image', compressedBase64);
+                } catch (err) { 
+                    console.error("Image process failed", err); 
+                    alert("圖片處理失敗，請嘗試其他圖片。");
                 }
-                target.value = ''; // 使用存下來的 target 清空
+                e.target.value = ''; // 清空 input
             };
             
+            // 使用新的圖片壓縮功能處理背景圖片
             const handleBgUpload = async (e) => {
-                const target = e.target; // 確保取得 target 參考
-                const file = target.files[0];
-                if (file) {
-                    if (file.size > 2 * 1024 * 1024) {
-                        alert("無法上傳：背景圖超過 2MB，請先壓縮後再試。");
-                        target.value = '';
-                        return;
-                    }
-                    try {
-                        const base64 = await fileToBase64(file);
-                        updateSettings({ backgroundImage: base64 });
-                    } catch (err) { 
-                        console.error(err); 
-                        alert("圖片處理失敗，請嘗試其他圖片。");
-                    }
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    // 背景圖限制在 1920x1080 確保畫質與效能
+                    const compressedBase64 = await processAndCompressImage(file, 1920, 1080, 0.8);
+                    updateSettings({ backgroundImage: compressedBase64 });
+                } catch (err) { 
+                    console.error("Background process failed", err); 
+                    alert("圖片處理失敗，請嘗試其他圖片或格式。");
                 }
-                target.value = ''; // 使用存下來的 target 清空
+                e.target.value = ''; // 清空 input
             };
 
             const handleDragStart = (index) => {
@@ -1471,7 +1466,7 @@
                                         <input type="text" placeholder="圖片連結 (或點右側上傳)" value={prize.image} onChange={(e) => updatePrizeField(prize.id, 'image', e.target.value)} className="flex-1 px-2 py-1 border rounded text-xs text-gray-600" />
                                         <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 border px-2 py-1 rounded text-xs flex items-center gap-1 transition-colors text-gray-600">
                                             <Upload className="w-3 h-3"/> 上傳
-                                            <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" className="hidden" onChange={(e) => handlePrizeImageUpload(e, prize.id)} onClick={(e) => { e.target.value = null; }} />
+                                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePrizeImageUpload(e, prize.id)} onClick={(e) => { e.target.value = ''; }} />
                                         </label>
                                     </div>
                                     </div>
@@ -1687,7 +1682,7 @@
                                                     <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors bg-white">
                                                         <Upload className="w-8 h-8 text-gray-400 mb-2"/>
                                                         <span className="text-sm text-gray-500 font-bold">點擊上傳背景圖片</span>
-                                                        <input type="file" accept="image/*" className="hidden" onChange={handleBgUpload} onClick={(e) => { e.target.value = null; }} />
+                                                        <input type="file" accept="image/*" className="hidden" onChange={handleBgUpload} onClick={(e) => { e.target.value = ''; }} />
                                                     </label>
                                                 )}
                                             </div>
@@ -1837,7 +1832,7 @@
                                         <button onClick={onExportBackup} className="flex-1 py-2 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 font-bold flex items-center justify-center gap-2"><Download className="w-4 h-4"/> 匯出備份</button>
                                         <label className="flex-1 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 font-bold flex items-center justify-center gap-2 cursor-pointer">
                                             <Upload className="w-4 h-4"/> 還原備份
-                                            <input type="file" accept="application/json" className="hidden" onChange={onImportBackup} onClick={(e) => { e.target.value = null; }} />
+                                            <input type="file" accept="application/json" className="hidden" onChange={onImportBackup} onClick={(e) => { e.target.value = ''; }} />
                                         </label>
                                     </div>
                                 </div>
@@ -2599,7 +2594,7 @@
                     <div className="p-4 border-t border-gray-200 bg-white grid grid-cols-2 gap-2"><button onClick={() => { setIsSettingsOpen(true); setSettingsTab('prizes'); soundManager.playClick(settings.sound.click); }} className="flex items-center justify-center gap-2 p-2 rounded text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"><Settings className="w-4 h-4" /> 設定</button><button onClick={() => { setIsDataModalOpen(true); soundManager.playClick(settings.sound.click); }} className="flex items-center justify-center gap-2 p-2 rounded text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"><Users className="w-4 h-4" /> 名單</button></div>
                 </div>
 
-                <div className={`flex-1 flex flex-col relative overflow-hidden ${backgroundImage ? 'bg-custom' : (bgAnimation === 'none' ? 'bg-gray-50' : bgAnimation === 'black' ? 'bg-black' : bgAnimation === 'aurora' ? 'bg-aurora' : bgAnimation === 'toystory' ? 'bg-toystory' : 'bg-gray-900')}`} style={backgroundImage ? { backgroundImage: `url("${backgroundImage}")` } : {}}>
+                <div className={`flex-1 flex flex-col relative overflow-hidden ${backgroundImage ? 'bg-custom' : (bgAnimation === 'none' ? 'bg-gray-50' : bgAnimation === 'black' ? 'bg-black' : bgAnimation === 'aurora' ? 'bg-aurora' : bgAnimation === 'toystory' ? 'bg-toystory' : 'bg-gray-900')}`} style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}}>
                     <div className={`absolute top-0 left-0 w-full h-full ${backgroundImage ? '' : (['none','black','aurora','toystory'].includes(bgAnimation) ? '' : `bg-gradient-to-b ${theme.bgGradient} opacity-90`)} z-0 pointer-events-none`}></div>
                     <button onClick={toggleFullscreen} className="absolute top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 shadow-sm" title={isFullscreen ? "退出全螢幕 (Esc)" : "進入全螢幕"}>{isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}</button>
                     {!isSidebarOpen && (<button onClick={() => setIsSidebarOpen(true)} className="absolute top-4 left-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 shadow-sm animate-fade-in" title="展開側邊欄"><Menu className="w-5 h-5" /></button>)}
@@ -2727,8 +2722,8 @@
                                             </div>
                                         ) : (
                                             <div ref={mainBtnRef} className="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 group cursor-pointer select-none" onMouseDown={handlePressStart} onMouseUp={handlePressEnd} onMouseLeave={handlePressCancel} onTouchStart={handlePressStart} onTouchEnd={handlePressEnd}>
-                                                <div className={`absolute inset-0 ${theme.primary} rounded-full opacity-20 ${buttonAnimation === 'ping' ? 'animate-ping' : ''} ${buttonAnimation === 'pulse' ? 'animate-btn-pulse' : ''} ${buttonAnimation === 'glow' ? 'animate-btn-glow' : ''} `}></div>
-                                                <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.3)] border-4 flex items-center justify-center transform transition-transform duration-200 ${isLongPressing ? 'scale-90' : (buttonAnimation === 'none' ? '' : 'group-hover:scale-105')} ${buttonAnimation === 'bounce' && !isLongPressing ? 'animate-bounce' : ''} ${buttonAnimation === 'shake' && !isLongPressing ? 'animate-btn-shake' : ''} ${buttonAnimation === 'spin' && !isLongPressing ? 'animate-btn-spin' : ''}`} style={{ borderColor: boxThemeColor }}>
+                                                <div className={`absolute inset-0 ${theme.primary} rounded-full opacity-20 ${buttonAnimation === 'ping' ? 'animate-ping' : ''}`}></div>
+                                                <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.3)] border-4 flex items-center justify-center transform transition-transform duration-200 ${isLongPressing ? 'scale-90' : 'group-hover:scale-105'}`} style={{ borderColor: boxThemeColor }}>
                                                     <span className="text-2xl md:text-3xl font-black text-white tracking-widest uppercase">{startButtonText}</span>
                                                 </div>
                                             </div>
