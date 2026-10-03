@@ -424,15 +424,6 @@
             mix-blend-mode: screen;
         }
 
-        .effect-countdown { background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, transparent 70%); display: flex; justify-content: center; align-items: center; }
-        .countdown-wrapper { position: relative; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
-        .countdown-ring { position: absolute; inset: 0; border-radius: 50%; border: 6px solid transparent; border-top-color: rgba(251, 191, 36, 0.8); border-right-color: rgba(245, 158, 11, 0.6); border-bottom-color: rgba(251, 191, 36, 0.4); box-shadow: 0 0 20px rgba(245, 158, 11, 0.6), inset 0 0 20px rgba(245, 158, 11, 0.4); animation: countdown-ring-spin 3.5s linear infinite; }
-        .countdown-pulse { position: absolute; inset: 15%; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.4) 0%, transparent 70%); filter: blur(10px); animation: countdown-pulse-anim 1.75s ease-in-out infinite alternate; }
-        .countdown-num { position: absolute; font-size: 140px; font-weight: 900; color: #fff; -webkit-text-stroke: 2px #d97706; text-shadow: 0 0 10px #fff, 0 0 30px #fbbf24, 0 0 60px #f59e0b; opacity: 0; font-family: 'Arial Black', sans-serif; line-height: 1; z-index: 10; }
-        .c-3 { animation: count-anim 3.5s linear forwards; animation-delay: 0s; }
-        .c-2 { animation: count-anim 3.5s linear forwards; animation-delay: 0.875s; }
-        .c-1 { animation: count-anim 3.5s linear forwards; animation-delay: 1.75s; }
-        
         .effect-toystory {
             mix-blend-mode: normal !important;
             display: flex;
@@ -756,22 +747,22 @@
         };
 
         const DEFAULT_PRESETS = [
-            { id: 'toystory', name: '🧸 玩具總動員', theme: 'toystory', bg: 'toystory', charge: 'toystory', sound: 'toystory', spin: 'toy_story', box: '#FACC15' }
+            { id: 'toystory', name: '玩具總動員', theme: 'toystory', bg: 'toystory', charge: 'toystory', sound: 'toystory', spin: 'toy_story', box: '#FACC15' }
         ];
 
         const BG_ANIMATIONS = {
-            none: { id: 'none', name: '⬜ 白底' }, 
-            black: { id: 'black', name: '⬛ 黑底' },
-            sparkles: { id: 'sparkles', name: '✨ 流金歲月' },
-            aurora: { id: 'aurora', name: '🌌 極光流動' },
-            confetti: { id: 'confetti', name: '🎊 繽紛彩帶' },
-            toystory: { id: 'toystory', name: '🧸 玩具總動員' }
+            none: { id: 'none', name: '白底' }, 
+            black: { id: 'black', name: '黑底' },
+            sparkles: { id: 'sparkles', name: '流金歲月' },
+            aurora: { id: 'aurora', name: '極光流動' },
+            confetti: { id: 'confetti', name: '繽紛彩帶' },
+            toystory: { id: 'toystory', name: '玩具總動員' }
         };
 
         const SPIN_ANIMATIONS = {
-            scroll: { id: 'scroll', name: '📜 直式跑馬燈 (預設)' },
-            slot: { id: 'slot', name: '🎰 幸運老虎機' },
-            toy_story: { id: 'toy_story', name: '🧸 玩具總動員' }
+            scroll: { id: 'scroll', name: '直式跑馬燈 (預設)' },
+            slot: { id: 'slot', name: '幸運老虎機' },
+            toy_story: { id: 'toy_story', name: '玩具總動員' }
         };
 
         const BUTTON_ANIMATIONS = {
@@ -787,11 +778,10 @@
         };
 
         const CHARGE_EFFECTS = {
-            flash: { id: 'flash', name: '⚡ 閃光脈衝 (預設)', className: 'effect-flash' },
-            implode: { id: 'implode', name: '🌈 霓虹聚光 (四色)', className: 'effect-implode' }, 
-            countdown: { id: 'countdown', name: '⏱️ 倒數計時', className: 'effect-countdown' },
-            toystory: { id: 'toystory', name: '🧸 玩具總動員', className: 'effect-toystory' }, 
-            toystory_buzz: { id: 'toystory_buzz', name: '🚀 巴斯光年 (飛向宇宙)', className: 'effect-buzz' },
+            flash: { id: 'flash', name: '閃光脈衝 (預設)', className: 'effect-flash' },
+            implode: { id: 'implode', name: '霓虹聚光 (四色)', className: 'effect-implode' }, 
+            toystory: { id: 'toystory', name: '玩具總動員', className: 'effect-toystory' }, 
+            toystory_buzz: { id: 'toystory_buzz', name: '巴斯光年 (飛向宇宙)', className: 'effect-buzz' },
         };
 
         const BOX_THEME_COLORS = [
@@ -810,7 +800,6 @@
                 default: { id: 'default', name: '能量' },
                 wind: { id: 'wind', name: '風聲' },
                 buzz_wind: { id: 'buzz_wind', name: '巴斯風暴' },
-                countdown: { id: 'countdown', name: '倒數計時' },
                 toystory: { id: 'toystory', name: '玩具總動員' }
             }
         };
@@ -987,57 +976,6 @@
                     soundManager.chargeOsc2.connect(soundManager.chargeGain2);
                     soundManager.chargeGain2.connect(soundManager.ctx.destination);
                     soundManager.chargeOsc2.start();
-                }
-                else if (variant === 'countdown') {
-                     type = 'sawtooth';
-                     vol = 0.08; 
-                     soundManager.chargeOsc.type = type;
-                     soundManager.chargeOsc.frequency.setValueAtTime(100, now);
-                     soundManager.chargeOsc.frequency.exponentialRampToValueAtTime(3000, endTime);
-                     
-                     const bufferSize = soundManager.ctx.sampleRate * 4;
-                     const buffer = soundManager.ctx.createBuffer(1, bufferSize, soundManager.ctx.sampleRate);
-                     const data = buffer.getChannelData(0);
-                     for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
-                     soundManager.chargeOsc2 = soundManager.ctx.createBufferSource();
-                     soundManager.chargeOsc2.buffer = buffer;
-                     soundManager.chargeOsc2.loop = true;
-                     const noiseFilter = soundManager.ctx.createBiquadFilter();
-                     noiseFilter.type = 'lowpass';
-                     noiseFilter.Q.value = 5; 
-                     noiseFilter.frequency.setValueAtTime(200, now);
-                     noiseFilter.frequency.exponentialRampToValueAtTime(5000, endTime); 
-                     soundManager.chargeGain2 = soundManager.ctx.createGain();
-                     soundManager.chargeGain2.gain.setValueAtTime(0.05, now);
-                     soundManager.chargeGain2.gain.linearRampToValueAtTime(0.2, endTime); 
-                     soundManager.chargeGain2.gain.exponentialRampToValueAtTime(0.001, endTime + fadeDuration);
-                     soundManager.chargeOsc2.connect(noiseFilter);
-                     noiseFilter.connect(soundManager.chargeGain2);
-                     soundManager.chargeGain2.connect(soundManager.ctx.destination);
-                     soundManager.chargeOsc2.start();
-                     const playTick = (delay, freq) => {
-                         const timer = setTimeout(() => {
-                             if (!soundManager.chargeOsc) return;
-                             const t = soundManager.ctx.currentTime;
-                             const osc = soundManager.ctx.createOscillator();
-                             const gain = soundManager.ctx.createGain();
-                             osc.type = 'square'; 
-                             osc.frequency.setValueAtTime(freq, t);
-                             gain.gain.setValueAtTime(0, t);
-                             gain.gain.linearRampToValueAtTime(0.3, t + 0.01); 
-                             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1); 
-                             osc.connect(gain);
-                             gain.connect(soundManager.ctx.destination);
-                             osc.start(t);
-                             osc.stop(t + 0.15);
-                             soundManager.trackNode(osc); 
-                         }, delay);
-                         soundManager.drumTimers.push(timer);
-                     };
-                     playTick(0, 880);       
-                     playTick(875, 880);     
-                     playTick(1750, 880);    
-                     playTick(2625, 1760);   
                 }
                 else if (variant === 'toystory') {
                     duration = 5.0; 
@@ -1264,7 +1202,7 @@
                     const presetToAdd = {
                         ...newPreset,
                         id: `custom_${Date.now()}`, 
-                        name: `✨ ${newPreset.name}` 
+                        name: newPreset.name 
                     };
                     setThemePresets([...themePresets, presetToAdd]);
                 }
@@ -1607,36 +1545,35 @@
                         {settingsTab === 'appearance' && (
                              <div className="p-6 space-y-6">
                                 {/* 主題套裝區塊保持不變，略過重複代碼 */}
-                                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded border shadow-sm border-yellow-200 relative overflow-hidden">
+                                <div className="bg-white rounded border shadow-sm overflow-hidden">
                                     <div 
-                                        className="flex justify-between items-center p-4 cursor-pointer hover:bg-yellow-100/50 transition-colors select-none"
+                                        className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors select-none"
                                         onClick={() => { setShowThemePresets(!showThemePresets); soundManager.playClick(settings.sound.click); }}
                                     >
-                                        <h3 className="font-bold text-yellow-800 flex items-center gap-2">
-                                            <Sparkles className="w-4 h-4 text-yellow-600"/> 精選主題套裝 (一鍵套用)
+                                        <h3 className="font-bold text-gray-700 flex items-center gap-2">
+                                            精選主題套裝
                                         </h3>
                                         <div className="flex items-center gap-3">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); handleSaveCurrentAsPreset(); }}
-                                                className="text-xs bg-white border border-yellow-300 text-yellow-700 px-2 py-1.5 rounded shadow-sm hover:bg-yellow-50 hover:shadow transition-all flex items-center gap-1 active:scale-95"
+                                                className="text-xs bg-white border border-gray-300 text-gray-700 px-2 py-1.5 rounded shadow-sm hover:bg-gray-50 hover:shadow transition-all flex items-center gap-1 active:scale-95"
                                             >
                                                 <Save className="w-3 h-3"/> 另存目前設定
                                             </button>
-                                            {showThemePresets ? <ChevronDown className="w-4 h-4 text-yellow-700" /> : <ChevronRight className="w-4 h-4 text-yellow-700" />}
+                                            {showThemePresets ? <ChevronDown className="w-4 h-4 text-gray-500" /> : <ChevronRight className="w-4 h-4 text-gray-500" />}
                                         </div>
                                     </div>
 
                                     {showThemePresets && (
-                                        <div className="p-4 pt-0 animate-fade-in">
+                                        <div className="p-4 border-t border-gray-100 animate-fade-in bg-gray-50/50">
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                                 {themePresets.map(preset => (
                                                     <div key={preset.id} className="relative group">
                                                         <button 
                                                             onClick={() => handleApplyPreset(preset)}
-                                                            className="w-full flex flex-col items-center justify-center p-2 bg-white border border-yellow-200 rounded-lg hover:shadow-md hover:bg-yellow-100 hover:-translate-y-0.5 transition-all text-sm font-bold text-gray-700 gap-1 active:scale-95 h-full"
+                                                            className="w-full flex flex-col items-center justify-center p-2 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:bg-gray-50 hover:-translate-y-0.5 transition-all text-sm font-bold text-gray-700 gap-1 active:scale-95 h-full"
                                                         >
-                                                            <span className="text-lg">{preset.name.split(' ')[0]}</span>
-                                                            <span className="text-xs font-normal text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">{preset.name.split(' ')[1] || preset.name.replace(/^.\s/, '')}</span>
+                                                            <span className="text-base text-center w-full truncate">{preset.name}</span>
                                                         </button>
                                                         <div className="absolute -top-1 -right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                                             <button onClick={(e) => { e.stopPropagation(); handleEditPreset(preset); }} className="bg-blue-500 text-white rounded-full p-1 shadow-sm hover:scale-110 hover:bg-blue-600 transition-transform"><Pencil className="w-3 h-3" /></button>
@@ -1645,7 +1582,7 @@
                                                     </div>
                                                 ))}
                                                 <button 
-                                                    className="flex flex-col items-center justify-center p-2 bg-yellow-50/50 border-2 border-dashed border-yellow-300 rounded-lg hover:bg-yellow-100 hover:border-yellow-400 transition-all text-yellow-600/70 hover:text-yellow-800 gap-1 active:scale-95 group min-h-[60px]"
+                                                    className="flex flex-col items-center justify-center p-2 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-all text-gray-500 hover:text-gray-700 gap-1 active:scale-95 group min-h-[60px]"
                                                     onClick={() => { setEditingId(null); setIsAddThemeModalOpen(true); soundManager.playClick(settings.sound.click); }}
                                                 >
                                                     <Plus className="w-6 h-6 group-hover:scale-110 transition-transform" /><span className="text-xs font-bold">新增主題</span>
@@ -1659,15 +1596,15 @@
                                     /* 新增主題 Modal 保持不變，但內部引用 newPreset 狀態所以沒問題 */
                                     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
                                         <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] animate-scale-in">
-                                            <div className="p-4 border-b bg-yellow-50 flex justify-between items-center">
-                                                <h3 className="font-bold text-lg text-yellow-800 flex items-center gap-2"><Sparkles className="w-5 h-5"/> {editingId ? '編輯主題套裝' : '新增自訂主題套裝'}</h3>
-                                                <button onClick={handleCloseModal} className="p-1 hover:bg-yellow-200 rounded-full transition-colors"><X className="w-5 h-5 text-yellow-700"/></button>
+                                            <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+                                                <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">{editingId ? '編輯主題套裝' : '新增自訂主題套裝'}</h3>
+                                                <button onClick={handleCloseModal} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500"/></button>
                                             </div>
                                             
                                             <div className="p-6 overflow-y-auto space-y-5 custom-scrollbar">
                                                 <div>
                                                     <label className="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">主題名稱</label>
-                                                    <input type="text" value={newPreset.name} onChange={e => setNewPreset({...newPreset, name: e.target.value})} className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 outline-none transition-all" placeholder="例如：我的專屬主題" autoFocus/>
+                                                    <input type="text" value={newPreset.name} onChange={e => setNewPreset({...newPreset, name: e.target.value})} className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all" placeholder="例如：我的專屬主題" autoFocus/>
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="col-span-2">
@@ -1706,7 +1643,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="p-4 border-t bg-gray-50 flex justify-end gap-3"><button onClick={handleCloseModal} className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">取消</button><button onClick={handleSaveNewPreset} className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg shadow-lg hover:shadow-xl transition-all transform active:scale-95 flex items-center gap-2">{editingId ? <Save className="w-4 h-4"/> : <Plus className="w-4 h-4"/>} {editingId ? '儲存變更' : '建立主題'}</button></div>
+                                            <div className="p-4 border-t bg-gray-50 flex justify-end gap-3"><button onClick={handleCloseModal} className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">取消</button><button onClick={handleSaveNewPreset} className="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg hover:shadow-xl transition-all transform active:scale-95 flex items-center gap-2">{editingId ? <Save className="w-4 h-4"/> : <Plus className="w-4 h-4"/>} {editingId ? '儲存變更' : '建立主題'}</button></div>
                                         </div>
                                     </div>
                                 )}
@@ -1765,16 +1702,6 @@
                                                 <button onClick={() => { updateSettings({ toggles: { ...settings.toggles, sound: !settings.toggles.sound } }); soundManager.playClick(settings.sound.click); }} className={`w-9 h-5 rounded-full transition-colors p-0.5 flex items-center ${settings.toggles.sound ? 'bg-green-500' : 'bg-gray-300'}`}><div className={`w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform ${settings.toggles.sound ? 'translate-x-4' : 'translate-x-0'}`} /></button>
                                             </div>
 
-                                            {settings.toggles.sound && (
-                                                <div className="space-y-2 mt-3 p-3 bg-white rounded-lg border border-gray-200">
-                                                    <label className="text-xs font-bold text-gray-500 block mb-2"><Speaker className="w-3 h-3 inline mr-1"/>音效風格選擇</label>
-                                                    <div>
-                                                        <span className="text-[10px] text-gray-400 block mb-0.5">蓄力音效</span>
-                                                        <select value={settings.sound.charge} onChange={(e) => updateSoundConfig('charge', e.target.value)} className="w-full px-2 py-1 border rounded text-xs bg-white text-gray-700 outline-none">{Object.values(SOUND_VARIANTS.charge).map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select>
-                                                    </div>
-                                                </div>
-                                            )}
-
                                             <div className="mb-2 mt-4"><label className="text-xs font-bold text-gray-500 mb-1 block">標題動畫特效</label><select value={settings.titleAnimation} onChange={(e) => updateSettings({ titleAnimation: e.target.value })} className="w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-700">{Object.values(TITLE_ANIMATIONS).map(anim => <option key={anim.id} value={anim.id}>{anim.name}</option>)}</select></div>
                                             <div className="mb-2"><label className="text-xs font-bold text-gray-500 mb-1 block">抽獎進行動畫</label><select value={settings.spinAnimation} onChange={(e) => updateSettings({ spinAnimation: e.target.value })} className="w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-700">{Object.values(SPIN_ANIMATIONS).map(anim => <option key={anim.id} value={anim.id}>{anim.name}</option>)}</select></div>
                                         </div>
@@ -1832,13 +1759,21 @@
 
                                             <div className="mb-4 border-t border-gray-200 pt-3 mt-3">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-yellow-500" /><span className="text-xs font-bold text-gray-600">長按蓄力特效</span></div>
+                                                    <div className="flex items-center gap-2"><span className="text-xs font-bold text-gray-600">長按蓄力特效</span></div>
                                                     <button onClick={() => { updateSettings({ charge: { ...settings.charge, enabled: !settings.charge.enabled } }); soundManager.playClick(settings.sound.click); }} className={`w-9 h-5 rounded-full transition-colors p-0.5 flex items-center ${settings.charge.enabled ? 'bg-green-500' : 'bg-gray-300'}`}><div className={`w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform ${settings.charge.enabled ? 'translate-x-4' : 'translate-x-0'}`} /></button>
                                                 </div>
                                                 
                                                 {settings.charge.enabled && (
                                                     <div className="px-1 space-y-3 mt-2">
                                                         <div><label className="text-[10px] font-bold text-gray-500 mb-1 block">特效樣式</label><select value={settings.charge.type} onChange={(e) => updateSettings({ charge: { ...settings.charge, type: e.target.value } })} className="w-full px-2 py-1 border rounded text-xs bg-white text-gray-700 outline-none focus:ring-1 focus:ring-blue-500">{Object.values(CHARGE_EFFECTS).map(effect => (<option key={effect.id} value={effect.id}>{effect.name}</option>))}</select></div>
+                                                        
+                                                        {settings.toggles.sound && (
+                                                            <div className="animate-fade-in">
+                                                                <label className="text-[10px] font-bold text-gray-500 mb-1 block">蓄力音效</label>
+                                                                <select value={settings.sound.charge} onChange={(e) => updateSoundConfig('charge', e.target.value)} className="w-full px-2 py-1 border rounded text-xs bg-white text-gray-700 outline-none focus:ring-1 focus:ring-blue-500">{Object.values(SOUND_VARIANTS.charge).map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select>
+                                                            </div>
+                                                        )}
+
                                                         {SUPPORT_INTENSITY_LIST.includes(settings.charge.type) && (
                                                             <div className="animate-fade-in"><div className="flex justify-between text-[10px] text-gray-400 mb-1"><span>強度: 低</span><span>高</span></div><input type="range" min="0" max="100" value={settings.charge.intensity} onChange={(e) => updateSettings({ charge: { ...settings.charge, intensity: parseInt(e.target.value) } })} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-500" /></div>
                                                         )}
@@ -1902,7 +1837,7 @@
                                                 </>
                                             ) : (
                                                 <div className="bg-red-50 p-3 rounded border border-red-100">
-                                                    <p className="text-sm font-bold text-red-800 mb-1 text-center">⚠️ 確定要清除所有資料嗎？</p>
+                                                    <p className="text-sm font-bold text-red-800 mb-1 text-center">確定要清除所有資料嗎？</p>
                                                     <div className="flex gap-2">
                                                         <button onClick={() => { setConfirmClearHistory(false); soundManager.playClick(settings.sound.click); }} className="flex-1 py-2 bg-white border border-gray-300 rounded text-gray-600 text-sm font-bold hover:bg-gray-50">取消</button>
                                                         <button onClick={() => { onFactoryReset(); soundManager.playClick(settings.sound.click); }} className="flex-1 py-2 bg-red-600 text-white rounded text-sm font-bold shadow hover:bg-red-700">確認重置</button>
@@ -1942,7 +1877,7 @@
                                 <button onClick={() => { setConfirmClearHistory(true); soundManager.playClick(settings.sound.click); }} className="w-full py-2 bg-red-50 text-red-600 rounded border border-red-200 hover:bg-red-100 font-bold text-sm transition-colors">清除中獎紀錄(保留名單)</button>
                                 ) : (
                                 <div className="bg-red-50 p-3 rounded border border-red-200 animate-fade-in">
-                                    <p className="text-center text-red-800 text-sm font-bold mb-2">⚠️ 確定要清除所有中獎紀錄嗎？</p>
+                                    <p className="text-center text-red-800 text-sm font-bold mb-2">確定要清除所有中獎紀錄嗎？</p>
                                     <div className="flex gap-2">
                                         <button onClick={() => { setConfirmClearHistory(false); soundManager.playClick(settings.sound.click); }} className="flex-1 py-2 bg-white border border-gray-300 rounded text-gray-600 text-sm">取消</button>
                                         <button onClick={() => { onFullReset(); setConfirmClearHistory(false); soundManager.playClick(settings.sound.click); }} className="flex-1 py-2 bg-red-600 text-white rounded text-sm font-bold shadow">確認清除</button>
@@ -2799,7 +2734,7 @@
                 </div>
 
                 {isLongPressing && (
-                    <div className={`effect-charge-overlay ${!['countdown','toystory','toystory_buzz','implode'].includes(charge.type) ? (CHARGE_EFFECTS[charge.type]?.className || 'effect-flash') : ''} ${charge.type === 'countdown' ? 'effect-countdown' : ''} ${charge.type === 'toystory' ? 'effect-toystory' : ''} ${charge.type === 'toystory_buzz' ? 'effect-buzz' : ''} ${charge.type === 'implode' ? 'effect-implode' : ''}`} style={{ '--charge-scale': 1.0 + (charge.intensity / 100) * 1.5, top: `${effectPos.y + (charge.y - 50) * 4}px`, left: `${effectPos.x + (charge.x - 50) * 4}px` }}>
+                    <div className={`effect-charge-overlay ${!['toystory','toystory_buzz','implode'].includes(charge.type) ? (CHARGE_EFFECTS[charge.type]?.className || 'effect-flash') : ''} ${charge.type === 'toystory' ? 'effect-toystory' : ''} ${charge.type === 'toystory_buzz' ? 'effect-buzz' : ''} ${charge.type === 'implode' ? 'effect-implode' : ''}`} style={{ '--charge-scale': 1.0 + (charge.intensity / 100) * 1.5, top: `${effectPos.y + (charge.y - 50) * 4}px`, left: `${effectPos.x + (charge.x - 50) * 4}px` }}>
                         {charge.type === 'implode' && (<><div className="implode-ring" style={{ width: '100%', height: '100%', animationDelay: '0s', borderColor: '#a855f7' }}></div><div className="implode-ring" style={{ width: '80%', height: '80%', animationDelay: '0.2s', borderColor: '#22c55e' }}></div><div className="implode-ring" style={{ width: '60%', height: '60%', animationDelay: '0.4s', borderColor: '#3b82f6' }}></div><div className="implode-ring" style={{ width: '40%', height: '40%', animationDelay: '0.6s', borderColor: '#ec4899' }}></div></>)}
                         {charge.type === 'toystory' && (<><div className="toy-rainbow-wrapper"><div className="toy-rainbow-rays"></div></div><div className="toy-badge-container"><div className="toy-badge-star"><Star size={80} className="text-red-500" fill="currentColor" /></div></div>{[...Array(8)].map((_, i) => { const toys = ['🚀', '🦖', '🥔', '👽', '🧸', '🐖', '🐶', '📦']; const angle = (i / 8) * Math.PI * 2; const dist = 300; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="toy-particle" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${i * 0.1}s` }}>{toys[i % toys.length]}</div>); })}</>)}
                         {charge.type === 'toystory_buzz' && (<div className="buzz-container"><div className="buzz-flying-group"><div className="buzz-jet-beam"></div><div className="buzz-wings"><div className="buzz-wing-left"><div className="buzz-wing-stripes"></div></div><div className="buzz-wing-right"><div className="buzz-wing-stripes"></div></div></div><div className="buzz-ring-purple"></div><div className="buzz-ring-green"></div><div className="buzz-core"><Star size={50} className="text-red-500 drop-shadow-sm" fill="#ef4444" /></div></div><div className="buzz-aftermath"><div className="buzz-smoke"></div>{[...Array(6)].map((_, i) => { const angle = (i / 6) * Math.PI * 2; const dist = 60 + Math.random() * 40; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="buzz-star" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${3.1 + Math.random() * 0.2}s` }}><Star size={20 + Math.random() * 15} fill="currentColor" /></div>); })}</div></div>)}
