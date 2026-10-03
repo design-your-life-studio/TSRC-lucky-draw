@@ -1275,35 +1275,47 @@
                 setPrizes(prizes.filter(p => p.id !== id));
             };
 
-            // 使用新的圖片壓縮功能處理獎項圖片
-            const handlePrizeImageUpload = async (e, id) => {
+            // 最原始的 FileReader 讀取，不依賴 Canvas 壓縮 (解決部分瀏覽器環境卡死問題)
+            const handlePrizeImageUpload = (e, id) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 
-                try {
-                    // 獎品圖不需要太大，限制在 500x500
-                    const compressedBase64 = await processAndCompressImage(file, 500, 500, 0.8);
-                    updatePrizeField(id, 'image', compressedBase64);
-                } catch (err) { 
-                    console.error("Image process failed", err); 
-                    alert("圖片處理失敗，請嘗試其他圖片。");
+                if (file.size > 4 * 1024 * 1024) {
+                    alert("圖片超過 4MB，為確保系統穩定，請使用容量較小的圖片");
+                    e.target.value = '';
+                    return;
                 }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    updatePrizeField(id, 'image', event.target.result);
+                };
+                reader.onerror = () => {
+                    alert("讀取圖片失敗，請換一張圖片試試");
+                };
+                reader.readAsDataURL(file);
                 e.target.value = ''; // 清空 input
             };
             
-            // 使用新的圖片壓縮功能處理背景圖片
-            const handleBgUpload = async (e) => {
+            // 最原始的 FileReader 讀取，不依賴 Canvas 壓縮 (解決部分瀏覽器環境卡死問題)
+            const handleBgUpload = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 
-                try {
-                    // 背景圖限制在 1920x1080 確保畫質與效能
-                    const compressedBase64 = await processAndCompressImage(file, 1920, 1080, 0.8);
-                    updateSettings({ backgroundImage: compressedBase64 });
-                } catch (err) { 
-                    console.error("Background process failed", err); 
-                    alert("圖片處理失敗，請嘗試其他圖片或格式。");
+                if (file.size > 4 * 1024 * 1024) {
+                    alert("圖片超過 4MB，為確保系統穩定，請使用容量較小的圖片");
+                    e.target.value = '';
+                    return;
                 }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    updateSettings({ backgroundImage: event.target.result });
+                };
+                reader.onerror = () => {
+                    alert("讀取圖片失敗，請換一張圖片試試");
+                };
+                reader.readAsDataURL(file);
                 e.target.value = ''; // 清空 input
             };
 
