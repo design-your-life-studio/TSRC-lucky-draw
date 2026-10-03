@@ -1279,6 +1279,13 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 
+                // 阻擋 HEIC 格式 (Mac/iPhone 預設)
+                if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+                    alert("由於網頁瀏覽器限制，不支援蘋果的 HEIC 格式，請轉為 JPG 或 PNG 後再上傳。");
+                    e.target.value = '';
+                    return;
+                }
+
                 if (file.size > 4 * 1024 * 1024) {
                     alert("圖片超過 4MB，為確保系統穩定，請使用容量較小的圖片");
                     e.target.value = '';
@@ -1288,11 +1295,11 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     updatePrizeField(id, 'image', event.target.result);
-                    e.target.value = ''; // 關鍵修正：讀取成功後才清空，避免瀏覽器中斷讀取
+                    e.target.value = ''; 
                 };
                 reader.onerror = () => {
                     alert("讀取圖片失敗，請換一張圖片試試");
-                    e.target.value = ''; // 失敗也清空
+                    e.target.value = ''; 
                 };
                 reader.readAsDataURL(file);
             };
@@ -1301,6 +1308,13 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 
+                // 阻擋 HEIC 格式 (Mac/iPhone 預設)
+                if (file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+                    alert("由於網頁瀏覽器限制，不支援蘋果的 HEIC 格式，請轉為 JPG 或 PNG 後再上傳。");
+                    e.target.value = '';
+                    return;
+                }
+
                 if (file.size > 4 * 1024 * 1024) {
                     alert("圖片超過 4MB，為確保系統穩定，請使用容量較小的圖片");
                     e.target.value = '';
@@ -1310,11 +1324,11 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     updateSettings({ backgroundImage: event.target.result });
-                    e.target.value = ''; // 關鍵修正：讀取成功後才清空，避免瀏覽器中斷讀取
+                    e.target.value = ''; 
                 };
                 reader.onerror = () => {
                     alert("讀取圖片失敗，請換一張圖片試試");
-                    e.target.value = ''; // 失敗也清空
+                    e.target.value = ''; 
                 };
                 reader.readAsDataURL(file);
             };
@@ -1478,7 +1492,7 @@
                                         <input type="text" placeholder="圖片連結 (或點右側上傳)" value={prize.image} onChange={(e) => updatePrizeField(prize.id, 'image', e.target.value)} className="flex-1 px-2 py-1 border rounded text-xs text-gray-600" />
                                         <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 border px-2 py-1 rounded text-xs flex items-center gap-1 transition-colors text-gray-600">
                                             <Upload className="w-3 h-3"/> 上傳
-                                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePrizeImageUpload(e, prize.id)} onClick={(e) => { e.target.value = ''; }} />
+                                            <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePrizeImageUpload(e, prize.id)} />
                                         </label>
                                     </div>
                                     </div>
@@ -1694,7 +1708,7 @@
                                                     <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors bg-white">
                                                         <Upload className="w-8 h-8 text-gray-400 mb-2"/>
                                                         <span className="text-sm text-gray-500 font-bold">點擊上傳背景圖片</span>
-                                                        <input type="file" accept="image/*" className="hidden" onChange={handleBgUpload} onClick={(e) => { e.target.value = ''; }} />
+                                                        <input type="file" accept="image/*" className="hidden" onChange={handleBgUpload} />
                                                     </label>
                                                 )}
                                             </div>
@@ -1844,7 +1858,7 @@
                                         <button onClick={onExportBackup} className="flex-1 py-2 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 font-bold flex items-center justify-center gap-2"><Download className="w-4 h-4"/> 匯出備份</button>
                                         <label className="flex-1 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 font-bold flex items-center justify-center gap-2 cursor-pointer">
                                             <Upload className="w-4 h-4"/> 還原備份
-                                            <input type="file" accept="application/json" className="hidden" onChange={onImportBackup} onClick={(e) => { e.target.value = ''; }} />
+                                            <input type="file" accept="application/json" className="hidden" onChange={onImportBackup} />
                                         </label>
                                     </div>
                                 </div>
