@@ -658,6 +658,9 @@
             startButtonText: "START",
             boxThemeColor: '#FACC15',
             boxBackgroundColor: '#2563EB', // 新增：中間抽獎區塊背景色預設為藍色
+            resultModalBgColor: '#FACC15', // 新增：中獎視窗背景色 (預設黃色)
+            resultCardBgColor: '#2563EB',  // 新增：中獎卡片背景色 (預設藍色)
+            resultCardTextColor: '#FFFFFF', // 新增：中獎卡片文字顏色 (預設白色)
             customTextColor: "",
             customThemeColor: "",
             charge: {
@@ -1758,16 +1761,26 @@
                                         <div className="p-4 border-t border-gray-100 animate-fade-in bg-gray-50/50">
                                             <div className="mb-4 p-3 bg-white rounded border border-gray-200">
                                                 <label className="text-xs font-bold text-gray-500 mb-2 block">自訂主題顏色 (覆蓋預設)</label>
-                                                <div className="flex gap-2 items-center">
-                                                    <input type="color" value={settings.customThemeColor || "#2563eb"} onChange={(e) => updateSettings({ customThemeColor: e.target.value })} className="w-10 h-10 p-1 border rounded cursor-pointer" />
-                                                    <div className="flex-1">
-                                                        {settings.customThemeColor ? (
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-sm font-mono">{settings.customThemeColor}</span>
-                                                                <button onClick={() => updateSettings({ customThemeColor: "" })} className="text-xs px-2 py-1 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100">重置</button>
-                                                            </div>
-                                                        ) : <span className="text-xs text-gray-400">點擊左側色塊選擇自訂顏色</span>}
-                                                    </div>
+                                                <div className="flex items-center gap-3">
+                                                    <input 
+                                                        type="color" 
+                                                        value={settings.customThemeColor || "#2563eb"} 
+                                                        onChange={(e) => updateSettings({ customThemeColor: e.target.value })} 
+                                                        className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0" 
+                                                    />
+                                                    <input 
+                                                        type="text" 
+                                                        value={settings.customThemeColor || ''} 
+                                                        onChange={(e) => updateSettings({ customThemeColor: e.target.value })} 
+                                                        placeholder="例如 #2563eb"
+                                                        className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all uppercase"
+                                                    />
+                                                    <button 
+                                                        onClick={() => updateSettings({ customThemeColor: "" })} 
+                                                        className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors whitespace-nowrap"
+                                                    >
+                                                        恢復預設
+                                                    </button>
                                                 </div>
                                             </div>
                                             <div className={`grid grid-cols-4 gap-2 ${settings.customThemeColor ? 'opacity-50 pointer-events-none grayscale' : ''}`}>
@@ -1797,23 +1810,107 @@
                                                 </div>
                                             </div>
 
-                                            {/* 新增：中間區塊背景顏色自訂 */}
-                                            <div className="mb-4">
-                                                <label className="text-xs font-bold text-gray-500 mb-2 block">中間抽獎區塊背景色</label>
-                                                <div className="flex items-center gap-3">
-                                                    <input 
-                                                        type="color" 
-                                                        value={settings.boxBackgroundColor || '#2563EB'} 
-                                                        onChange={(e) => updateSettings({ boxBackgroundColor: e.target.value })} 
-                                                        className="w-10 h-10 p-1 border rounded cursor-pointer bg-white"
-                                                    />
-                                                    <span className="text-sm font-mono text-gray-600">{settings.boxBackgroundColor || '#2563EB'}</span>
-                                                    <button 
-                                                        onClick={() => updateSettings({ boxBackgroundColor: '#2563EB' })} 
-                                                        className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm"
-                                                    >
-                                                        恢復預設
-                                                    </button>
+                                            {/* 新增：自訂顏色設定區塊 (統一 UI) */}
+                                            <div className="mb-4 space-y-4 border-t border-gray-200 pt-4 mt-2">
+                                                
+                                                {/* 1. 中間抽獎區塊背景色 */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-500 mb-2 block">中間抽獎區塊背景色</label>
+                                                    <div className="flex items-center gap-3">
+                                                        <input 
+                                                            type="color" 
+                                                            value={settings.boxBackgroundColor || '#2563EB'} 
+                                                            onChange={(e) => updateSettings({ boxBackgroundColor: e.target.value })} 
+                                                            className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            value={settings.boxBackgroundColor || '#2563EB'} 
+                                                            onChange={(e) => updateSettings({ boxBackgroundColor: e.target.value })} 
+                                                            className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+                                                        />
+                                                        <button 
+                                                            onClick={() => updateSettings({ boxBackgroundColor: '#2563EB' })} 
+                                                            className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                        >
+                                                            恢復預設
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* 2. 中獎視窗背景色 */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-500 mb-2 block">中獎視窗背景色</label>
+                                                    <div className="flex items-center gap-3">
+                                                        <input 
+                                                            type="color" 
+                                                            value={settings.resultModalBgColor || '#FACC15'} 
+                                                            onChange={(e) => updateSettings({ resultModalBgColor: e.target.value })} 
+                                                            className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            value={settings.resultModalBgColor || '#FACC15'} 
+                                                            onChange={(e) => updateSettings({ resultModalBgColor: e.target.value })} 
+                                                            className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+                                                        />
+                                                        <button 
+                                                            onClick={() => updateSettings({ resultModalBgColor: '#FACC15' })} 
+                                                            className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                        >
+                                                            恢復預設
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* 3. 中獎卡片背景色 */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-500 mb-2 block">中獎卡片背景色</label>
+                                                    <div className="flex items-center gap-3">
+                                                        <input 
+                                                            type="color" 
+                                                            value={settings.resultCardBgColor || '#2563EB'} 
+                                                            onChange={(e) => updateSettings({ resultCardBgColor: e.target.value })} 
+                                                            className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            value={settings.resultCardBgColor || '#2563EB'} 
+                                                            onChange={(e) => updateSettings({ resultCardBgColor: e.target.value })} 
+                                                            className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+                                                        />
+                                                        <button 
+                                                            onClick={() => updateSettings({ resultCardBgColor: '#2563EB' })} 
+                                                            className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                        >
+                                                            恢復預設
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* 4. 中獎卡片文字顏色 */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-500 mb-2 block">中獎卡片文字顏色</label>
+                                                    <div className="flex items-center gap-3">
+                                                        <input 
+                                                            type="color" 
+                                                            value={settings.resultCardTextColor || '#FFFFFF'} 
+                                                            onChange={(e) => updateSettings({ resultCardTextColor: e.target.value })} 
+                                                            className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            value={settings.resultCardTextColor || '#FFFFFF'} 
+                                                            onChange={(e) => updateSettings({ resultCardTextColor: e.target.value })} 
+                                                            className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+                                                        />
+                                                        <button 
+                                                            onClick={() => updateSettings({ resultCardTextColor: '#FFFFFF' })} 
+                                                            className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                        >
+                                                            恢復預設
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -1983,163 +2080,7 @@
                 </div>
             );
         };
-
-        const DataImportModal = ({ isOpen, onClose, participants, setParticipants, setGlobalWinners, generateMockData, globalWinners, theme, absentWinners, soundConfig, importHistory, setImportHistory }) => {
-            const [activeTab, setActiveTab] = useState('list');
-            const [textData, setTextData] = useState("");
-            const [searchTerm, setSearchTerm] = useState("");
-            const [pendingImport, setPendingImport] = useState(null);
-            const [importStep, setImportStep] = useState('input'); // 補上遺漏的 state 定義
-            const [errorMsg, setErrorMsg] = useState(""); // 補上遺漏的 state 定義
-            const [confirmReset, setConfirmReset] = useState(false); // 補上遺漏的 state 定義
-
-            // --- 修復關鍵：如果 isOpen 為 false，則不渲染任何內容 ---
-            if (!isOpen) return null;
-
-            const filteredParticipants = participants.filter(p => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.name.includes(searchTerm) || p.dept.includes(searchTerm) || (p.group && p.group.includes(searchTerm)));
-            
-            const handleParseAndVerify = () => {
-                setErrorMsg("");
-                const lines = textData.split('\n').filter(line => line.trim() !== '');
-                if (lines.length === 0) { setErrorMsg("請輸入或貼上資料"); return; }
-                const newParticipants = lines.map((line, idx) => {
-                    let parts = line.split('\t');
-                    if (parts.length < 2) parts = line.split(/[,\s]+/); // Fallback for comma/space
-                    parts = parts.map(p => p.trim()).filter(p => p !== '');
-                    // 解析格式：編號, 姓名, 部門, 分組(選填)
-                    return { 
-                        id: parts[0] || `ID-${idx}`, 
-                        name: parts[1] || '未知姓名', 
-                        dept: parts[2] || '未知部門',
-                        group: parts[3] || '一般組' // 新增分組解析
-                    };
-                });
-                setPendingImport(newParticipants); setImportStep('confirm');
-            };
-
-            const confirmImport = () => { 
-                if (pendingImport) { 
-                    // 1. 儲存到歷史紀錄
-                    const newHistoryItem = {
-                        id: Date.now(),
-                        date: new Date().toLocaleString(),
-                        count: pendingImport.length,
-                        data: pendingImport,
-                        name: `匯入名單 (${new Date().toLocaleString()})`
-                    };
-                    setImportHistory(prev => [newHistoryItem, ...(prev || [])]);
-
-                    // 2. 套用新名單
-                    setParticipants(pendingImport); 
-                    setGlobalWinners(new Set()); 
-                    setTextData(""); 
-                    setPendingImport(null); 
-                    setImportStep('input'); 
-                    setActiveTab('list'); 
-                    soundManager.playClick(soundConfig?.click); 
-                } 
-            };
-            
-            const cancelImport = () => { setPendingImport(null); setImportStep('input'); soundManager.playClick(soundConfig?.click); };
-            const loadCurrentData = () => { const rawText = participants.map(p => `${p.id}\t${p.name}\t${p.dept}\t${p.group || '一般組'}`).join('\n'); setTextData(rawText); };
-            const handleResetTest = () => { setParticipants(generateMockData(1000)); setGlobalWinners(new Set()); setActiveTab('list'); setConfirmReset(false); soundManager.playClick(soundConfig?.click); }
-            
-            // 歷史紀錄相關功能
-            const restoreHistory = (item) => {
-                if(confirm(`確定要還原「${item.name}」這份名單嗎？\n這將會覆蓋目前的名單與中獎狀態。`)) {
-                    setParticipants(item.data);
-                    setGlobalWinners(new Set());
-                    setActiveTab('list');
-                    soundManager.playClick(soundConfig?.click);
-                    alert("名單已還原！");
-                }
-            };
-
-            const deleteHistory = (id) => {
-                if(confirm("確定要刪除此筆歷史紀錄？")) {
-                    setImportHistory(prev => prev.filter(item => item.id !== id));
-                    soundManager.playClick(soundConfig?.click);
-                }
-            };
-
-            return (
-                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl animate-scale-in">
-                    <div className="p-4 border-b bg-gray-50 flex justify-between items-center"><h3 className="font-bold text-lg flex items-center gap-2"><Users className="w-5 h-5"/> 名單管理</h3><button onClick={() => { onClose(); soundManager.playClick(soundConfig?.click); }}><X className="w-5 h-5"/></button></div>
-                    <div className="flex border-b bg-white">
-                        <button onClick={() => { setActiveTab('list'); soundManager.playClick(soundConfig?.click); }} className={`flex-1 py-3 text-sm font-bold border-b-2 ${activeTab === 'list' ? `${theme.text} ${theme.border} ${theme.secondary}` : 'border-transparent text-gray-500'}`}>目前名單</button>
-                        <button onClick={() => { setActiveTab('import'); soundManager.playClick(soundConfig?.click); }} className={`flex-1 py-3 text-sm font-bold border-b-2 ${activeTab === 'import' ? `${theme.text} ${theme.border} ${theme.secondary}` : 'border-transparent text-gray-500'}`}>匯入/編輯</button>
-                        <button onClick={() => { setActiveTab('history'); soundManager.playClick(soundConfig?.click); }} className={`flex-1 py-3 text-sm font-bold border-b-2 ${activeTab === 'history' ? `${theme.text} ${theme.border} ${theme.secondary}` : 'border-transparent text-gray-500'}`}>歷史紀錄 ({importHistory?.length || 0})</button>
-                    </div>
-                    
-                    <div className="flex-1 overflow-hidden bg-gray-50 p-6 relative flex flex-col">
-                    {activeTab === 'list' && (
-                        <div className="flex-1 min-h-0 flex flex-col space-y-4">
-                        <div className="relative"><Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" /><input type="text" placeholder="搜尋..." className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/></div>
-                        <div className="flex-1 min-h-0 overflow-y-auto bg-white border rounded-lg shadow-inner">
-                            <table className="w-full text-sm text-left"><thead className="bg-gray-100 font-bold sticky top-0 z-10 shadow-sm"><tr><th className="p-3">編號</th><th className="p-3">姓名</th><th className="p-3">部門</th><th className="p-3">分組</th><th className="p-3">狀態</th></tr></thead>
-                            <tbody className="divide-y">{filteredParticipants.length > 0 ? (filteredParticipants.map((p) => { const isAbsent = absentWinners.has(p.id); const isWinner = globalWinners.has(p.id); return (<tr key={p.id} className={isWinner ? 'bg-yellow-50' : (isAbsent ? 'bg-red-50 opacity-75' : '')}><td className="p-3 font-mono text-gray-500">{p.id}</td><td className="p-3 font-bold">{p.name}</td><td className="p-3 text-gray-500">{p.dept}</td><td className="p-3 text-gray-500"><span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{p.group || '-'}</span></td><td className="p-3">{isAbsent ? <span className="text-red-600 font-bold flex items-center gap-1"><UserX className="w-3 h-3"/> 缺席</span> : isWinner ? <span className="text-yellow-700 font-bold flex items-center gap-1"><Trophy className="w-3 h-3"/> 中獎</span> : '-'}</td></tr>); })) : (<tr><td colSpan="5" className="p-8 text-center text-gray-400">查無資料</td></tr>)}</tbody></table>
-                        </div>
-                        <div className="text-xs text-gray-500 text-right">共 {filteredParticipants.length} 筆資料</div>
-                        </div>
-                    )}
-                    
-                    {activeTab === 'import' && (
-                        <div className="flex-1 min-h-0 flex flex-col bg-white rounded-lg border p-6 relative">
-                        {importStep === 'input' ? (<><div className="flex justify-between items-center mb-2"><p className="text-sm text-gray-500">支援 Excel 複製貼上 (Tab 分隔)。格式：編號 姓名 部門 分組(選填)</p><button onClick={loadCurrentData} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded border text-gray-600 font-bold">載入目前 {participants.length} 筆資料</button></div><textarea className="flex-1 w-full border rounded p-3 font-mono text-sm bg-gray-50 focus:ring-2 focus:ring-red-500 outline-none" value={textData} onChange={(e) => setTextData(e.target.value)} placeholder={`A001\t王大明\t業務部\tA組\nA002\t李小華\t財務部\tB組...`} />{errorMsg && <p className="text-red-600 text-sm mt-2 flex items-center gap-1"><AlertTriangle className="w-4 h-4"/> {errorMsg}</p>}<div className="mt-4 flex gap-4"><button onClick={() => { handleParseAndVerify(); soundManager.playClick(soundConfig?.click); }} className={`flex-1 ${theme.primary} text-white py-2 rounded font-bold hover:opacity-90 flex items-center justify-center gap-2`}><Upload className="w-4 h-4"/> 確認覆蓋匯入</button>{!confirmReset ? (<button onClick={() => { setConfirmReset(true); soundManager.playClick(soundConfig?.click); }} className="px-4 py-2 border rounded hover:bg-gray-50 text-gray-600">重置測試資料</button>) : (<div className="flex gap-2 items-center bg-gray-100 px-2 rounded"><span className="text-xs text-red-500 font-bold">確定重置?</span><button onClick={handleResetTest} className="text-xs bg-red-500 text-white px-2 py-1 rounded">是</button><button onClick={() => { setConfirmReset(false); soundManager.playClick(soundConfig?.click); }} className="text-xs bg-gray-300 px-2 py-1 rounded">否</button></div>)}</div></>) : (<div className="flex-1 flex flex-col items-center justify-center text-center p-8"><div className="bg-yellow-50 p-4 rounded-full mb-4"><AlertTriangle className="w-12 h-12 text-yellow-600" /></div><h3 className="text-2xl font-bold text-gray-800 mb-2">確認匯入資料？</h3><p className="text-gray-600 mb-6">即將匯入 <span className="font-bold text-red-600 text-xl">{pendingImport?.length}</span> 筆新資料。<br/>這將會<span className="font-bold text-red-600">完全覆蓋</span>目前的 {participants.length} 筆資料，並重置中獎紀錄。</p><div className="flex gap-4 w-full max-w-md"><button onClick={cancelImport} className="flex-1 py-3 border border-gray-300 rounded-lg text-gray-600 font-bold hover:bg-gray-50">取消</button><button onClick={confirmImport} className={`flex-1 py-3 ${theme.primary} text-white rounded-lg font-bold hover:opacity-90 shadow-lg`}>確認並存檔</button></div></div>)}
-                        </div>
-                    )}
-                    
-                    {/* 已移除重複的 activeTab === 'import' 區塊 */}
-                    
-                    {activeTab === 'history' && (
-                        <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
-                            {importHistory && importHistory.length > 0 ? (
-                                importHistory.map((item) => (
-                                    <div key={item.id} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex justify-between items-center hover:shadow-md transition-shadow">
-                                        <div>
-                                            <div className="font-bold text-gray-800 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-gray-500"/>
-                                                {item.date}
-                                            </div>
-                                            <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                                                <FileText className="w-3 h-3"/>
-                                                共 <span className="font-mono font-bold text-gray-700">{item.count}</span> 筆資料
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button 
-                                                onClick={() => restoreHistory(item)}
-                                                className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded text-sm font-bold hover:bg-blue-100 flex items-center gap-1 border border-blue-100"
-                                            >
-                                                <RotateCcw className="w-3 h-3"/> 還原此版
-                                            </button>
-                                            <button 
-                                                onClick={() => deleteHistory(item.id)}
-                                                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                                                title="刪除紀錄"
-                                            >
-                                                <Trash2 className="w-4 h-4"/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                                    <History className="w-12 h-12 mb-3 text-gray-300"/>
-                                    <p>目前沒有匯入紀錄</p>
-                                    <p className="text-xs mt-1">每次匯入名單後，系統會自動在此建立備份。</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                    
-                    </div>
-                </div>
-                </div>
-            );
-        };
-        const ResultModal = ({ isOpen, onClose, currentPrize, currentRoundWinners, theme, allPrizes, onReplaceWinner, openConfirm, boxThemeColor, soundConfig }) => {
+        const ResultModal = ({ isOpen, onClose, currentPrize, currentRoundWinners, theme, allPrizes, onReplaceWinner, openConfirm, boxThemeColor, boxBackgroundColor, resultModalBgColor, resultCardBgColor, resultCardTextColor, soundConfig }) => {
             const [markedIds, setMarkedIds] = useState(new Set());
             const [confettiParticles, setConfettiParticles] = useState([]);
 
@@ -2207,7 +2148,7 @@
                     ))}
                 </div>
 
-                <div className={`relative w-full max-w-5xl max-h-[90vh] bg-gradient-to-br ${theme.gradient} rounded-2xl p-1 shadow-2xl border-4 flex flex-col z-[55]`} style={{ borderColor: boxThemeColor }}>
+                <div className={`relative w-full max-w-5xl max-h-[90vh] rounded-2xl p-1 shadow-2xl border-4 flex flex-col z-[55]`} style={{ borderColor: boxThemeColor, backgroundColor: resultModalBgColor || '#FACC15' }}>
                     <button onClick={onClose} className="absolute -top-4 -right-4 bg-white text-black rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"><X className="w-6 h-6" /></button>
                     <div className="bg-white/10 backdrop-blur-sm flex-1 rounded-xl p-8 overflow-hidden flex flex-col">
                         <div className="text-center mb-4">
@@ -2223,14 +2164,13 @@
                                     const nameSizeClass = "text-2xl md:text-3xl"; 
 
                                     return (
-                                        <div key={idx} className={`group relative w-60 md:w-72 text-center p-4 rounded-lg shadow-lg transition-all border backdrop-blur-md ${theme.cardBg} ${isMarked ? 'opacity-50 grayscale bg-gray-800 border-gray-600' : 'transform hover:scale-105'}`}>
+                                        <div key={idx} className={`group relative w-60 md:w-72 text-center p-4 rounded-lg shadow-lg transition-all border backdrop-blur-md border-white/20 ${isMarked ? 'opacity-50 grayscale bg-gray-800 border-gray-600' : 'transform hover:scale-105'}`} style={isMarked ? {} : { backgroundColor: resultCardBgColor || '#2563EB' }}>
                                             {winCount > 1 && !isMarked && (<div className={`absolute -top-2 -right-2 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md animate-bounce ${textColorClass}`} style={{ backgroundColor: boxThemeColor }}><Crown className="w-3 h-3 fill-current" /> x{winCount}</div>)}
                                             {isMarked && (<div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg z-10 pointer-events-none"><span className="text-red-400 font-bold border-2 border-red-400 px-2 py-1 rounded -rotate-12">將移除</span></div>)}
-                                            {/* 修改：移除 font-mono，改為 font-bold 以匹配姓名樣式 */}
-                                            <div className="text-[22px] text-white font-bold mb-1">{winner.id}</div>
-                                            <div className={`font-bold break-words min-h-[2.25rem] flex items-center justify-center ${nameSizeClass}`}>{winner.name}</div>
-                                            {/* 修改：部門字體大小維持 18px */}
-                                            <div className="text-[18px] text-white mt-1 flex items-center justify-center gap-2">
+                                            {/* 修改：移除預設的 text-white，統一改用 resultCardTextColor，並預設為白色 */}
+                                            <div className="text-[22px] font-bold mb-1" style={{ color: resultCardTextColor || '#FFFFFF' }}>{winner.id}</div>
+                                            <div className={`font-bold break-words min-h-[2.25rem] flex items-center justify-center ${nameSizeClass}`} style={{ color: resultCardTextColor || '#FFFFFF' }}>{winner.name}</div>
+                                            <div className="text-[18px] mt-1 flex items-center justify-center gap-2" style={{ color: resultCardTextColor || '#FFFFFF' }}>
                                                 <span>{winner.dept}</span>
                                                 {/* 已隱藏組別顯示，僅保留於後台 */}
                                             </div>
@@ -2252,6 +2192,214 @@
                         </div>
                     </div>
                 </div>
+                </div>
+            );
+        };
+
+        const DataImportModal = ({ isOpen, onClose, participants, setParticipants, setGlobalWinners, generateMockData, globalWinners, theme, absentWinners, soundConfig, importHistory, setImportHistory }) => {
+            const [inputText, setInputText] = useState('');
+            const [activeTab, setActiveTab] = useState('list'); // 'list', 'import', 'history'
+            const [importMode, setImportMode] = useState('append'); // 'append' or 'replace'
+
+            if (!isOpen) return null;
+
+            const handleImport = () => {
+                if (!inputText.trim()) return alert("請貼上資料");
+                soundManager.playClick(soundConfig?.click);
+                
+                const lines = inputText.trim().split('\n');
+                const parsedData = lines.map((line, index) => {
+                    const parts = line.split('\t'); 
+                    if (parts.length >= 2) {
+                        return {
+                            id: parts[0]?.trim() || `ID-${Date.now()}-${index}`,
+                            name: parts[1]?.trim() || '未知',
+                            dept: parts[2]?.trim() || '無',
+                            group: parts[3]?.trim() || '一般組'
+                        };
+                    }
+                    return null;
+                }).filter(Boolean);
+
+                if (parsedData.length === 0) {
+                    return alert("解析失敗，請確認格式是否正確 (Excel 複製貼上，需包含 ID 與 姓名)");
+                }
+
+                // 儲存歷史紀錄
+                const newHistoryRecord = {
+                    timestamp: new Date().toISOString(),
+                    count: participants.length,
+                    data: [...participants]
+                };
+                setImportHistory(prev => [newHistoryRecord, ...(prev || [])].slice(0, 5));
+
+                let newParticipants;
+                if (importMode === 'replace') {
+                    newParticipants = parsedData;
+                    setGlobalWinners(new Set()); 
+                } else {
+                    newParticipants = [...participants, ...parsedData];
+                }
+                
+                // 透過 ID 去除重複項目
+                const uniqueParticipants = Array.from(new Map(newParticipants.map(item => [item.id, item])).values());
+                
+                setParticipants(uniqueParticipants);
+                setInputText('');
+                setActiveTab('list');
+                alert(`成功匯入 ${parsedData.length} 筆資料，當前總計 ${uniqueParticipants.length} 筆。`);
+            };
+
+            const handleClearAll = () => {
+                if (confirm("確定要清空所有名單嗎？這將會重置中獎紀錄！")) {
+                    soundManager.playClick(soundConfig?.click);
+                    const newHistoryRecord = { timestamp: new Date().toISOString(), count: participants.length, data: [...participants] };
+                    setImportHistory(prev => [newHistoryRecord, ...(prev || [])].slice(0, 5));
+                    
+                    setParticipants([]);
+                    setGlobalWinners(new Set());
+                }
+            };
+
+            const handleLoadMock = () => {
+                soundManager.playClick(soundConfig?.click);
+                const mock = generateMockData(200);
+                setParticipants(mock);
+                setActiveTab('list');
+            };
+
+            const restoreHistory = (historyItem) => {
+                if (confirm(`確定要還原到 ${new Date(historyItem.timestamp).toLocaleString()} 的名單狀態嗎？`)) {
+                    soundManager.playClick(soundConfig?.click);
+                    setParticipants(historyItem.data);
+                    setActiveTab('list');
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] animate-scale-in">
+                        <div className="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
+                            <h2 className="text-xl font-bold flex items-center gap-2 text-gray-800"><Users className="w-5 h-5"/> 名單管理中心</h2>
+                            <button onClick={() => { onClose(); soundManager.playClick(soundConfig?.click); }} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X className="w-5 h-5 text-gray-600" /></button>
+                        </div>
+
+                        <div className="flex border-b">
+                            <button onClick={() => { setActiveTab('list'); soundManager.playClick(soundConfig?.click); }} className={`flex-1 py-3 font-bold border-b-2 ${activeTab === 'list' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}>目前名單 ({participants.length})</button>
+                            <button onClick={() => { setActiveTab('import'); soundManager.playClick(soundConfig?.click); }} className={`flex-1 py-3 font-bold border-b-2 ${activeTab === 'import' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}>匯入資料</button>
+                            <button onClick={() => { setActiveTab('history'); soundManager.playClick(soundConfig?.click); }} className={`flex-1 py-3 font-bold border-b-2 ${activeTab === 'history' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:bg-gray-50'}`}>名單歷史紀錄</button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-gray-50/50">
+                            {activeTab === 'list' && (
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <div className="flex gap-2">
+                                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold shadow-sm">已抽中: {globalWinners.size}</span>
+                                            <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold shadow-sm">缺席: {absentWinners.size}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={handleLoadMock} className="px-3 py-1.5 text-xs bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 rounded font-bold transition-colors shadow-sm">載入測試資料</button>
+                                            <button onClick={handleClearAll} className="px-3 py-1.5 text-xs bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 rounded font-bold transition-colors shadow-sm"><Trash2 className="w-3 h-3 inline mr-1"/>清空名單</button>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded border overflow-hidden shadow-sm">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="bg-gray-100 font-bold border-b text-gray-700">
+                                                <tr>
+                                                    <th className="p-3">編號 (ID)</th>
+                                                    <th className="p-3">姓名</th>
+                                                    <th className="p-3">部門</th>
+                                                    <th className="p-3">分組</th>
+                                                    <th className="p-3">狀態</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y max-h-[50vh] overflow-y-auto text-gray-600">
+                                                {participants.slice(0, 100).map((p, i) => (
+                                                    <tr key={i} className="hover:bg-blue-50 transition-colors">
+                                                        <td className="p-3 font-mono text-gray-500">{p.id}</td>
+                                                        <td className="p-3 font-bold text-gray-800">{p.name}</td>
+                                                        <td className="p-3">{p.dept}</td>
+                                                        <td className="p-3"><span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{p.group || '-'}</span></td>
+                                                        <td className="p-3">
+                                                            {globalWinners.has(p.id) ? <span className="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded-full"><CheckCircle className="w-3 h-3 inline mr-1"/>已中獎</span> : absentWinners.has(p.id) ? <span className="text-red-500 font-bold text-xs bg-red-50 px-2 py-1 rounded-full"><UserX className="w-3 h-3 inline mr-1"/>缺席</span> : <span className="text-gray-400 text-xs">未抽</span>}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        {participants.length > 100 && (
+                                            <div className="p-3 text-center text-xs text-gray-500 bg-gray-50 border-t">
+                                                僅顯示前 100 筆資料，共 {participants.length} 筆
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'import' && (
+                                <div className="space-y-4">
+                                    <div className="bg-blue-50 border border-blue-200 rounded p-4 shadow-sm">
+                                        <h3 className="font-bold text-blue-800 mb-2 flex items-center gap-1"><AlertTriangle className="w-4 h-4"/> 從 Excel 匯入說明</h3>
+                                        <ul className="list-disc list-inside text-sm text-blue-700 space-y-1 ml-1">
+                                            <li>請直接從 Excel 複製表格內容，並貼在下方文字框。</li>
+                                            <li>欄位順序必須為：<span className="font-bold text-blue-900 bg-blue-100 px-1 rounded">編號 (ID)</span> | <span className="font-bold text-blue-900 bg-blue-100 px-1 rounded">姓名</span> | <span className="font-bold text-blue-900 bg-blue-100 px-1 rounded">部門</span> | <span className="font-bold text-blue-900 bg-blue-100 px-1 rounded">分組</span>。</li>
+                                            <li>請勿複製表頭 (標題列)，若不慎複製，匯入後請手動刪除第一筆。</li>
+                                        </ul>
+                                    </div>
+                                    <div className="flex gap-6 items-center p-3 bg-white border rounded shadow-sm">
+                                        <label className="flex items-center gap-2 text-sm cursor-pointer font-bold text-gray-700">
+                                            <input type="radio" checked={importMode === 'append'} onChange={() => { setImportMode('append'); soundManager.playClick(soundConfig?.click); }} className="text-blue-600 focus:ring-blue-500 w-4 h-4" /> 追加到現有名單 (以 ID 去除重複)
+                                        </label>
+                                        <label className="flex items-center gap-2 text-sm cursor-pointer font-bold text-red-600">
+                                            <input type="radio" checked={importMode === 'replace'} onChange={() => { setImportMode('replace'); soundManager.playClick(soundConfig?.click); }} className="text-red-600 focus:ring-red-500 w-4 h-4" /> 完全覆蓋 (將清空中獎紀錄)
+                                        </label>
+                                    </div>
+                                    <textarea 
+                                        className="w-full h-64 p-4 border rounded shadow-inner resize-none text-sm font-mono focus:ring-2 focus:ring-blue-400 outline-none bg-white whitespace-pre text-gray-600" 
+                                        placeholder="在此貼上 Excel 資料...&#10;EMP001&#9;王小明&#9;資訊部&#9;A組&#10;EMP002&#9;陳小華&#9;業務部&#9;B組"
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                    ></textarea>
+                                    <div className="flex justify-end">
+                                        <button onClick={handleImport} className="px-8 py-2.5 bg-blue-600 text-white font-bold rounded shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all transform active:scale-95 flex items-center gap-2">
+                                            <Upload className="w-4 h-4" /> 開始解析並匯入
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'history' && (
+                                <div className="space-y-4">
+                                    <div className="bg-white p-3 rounded border text-sm text-gray-600 flex items-center gap-2 shadow-sm">
+                                        <History className="w-4 h-4 text-blue-500" /> 系統會自動保留最近 5 次名單變更紀錄，避免誤刪資料。
+                                    </div>
+                                    <div className="space-y-3">
+                                        {(!importHistory || importHistory.length === 0) ? (
+                                            <div className="text-center py-12 text-gray-400 border-2 border-dashed rounded-lg bg-white">尚無歷史紀錄</div>
+                                        ) : (
+                                            importHistory.map((historyItem, idx) => (
+                                                <div key={idx} className="bg-white p-4 rounded-lg border shadow-sm flex justify-between items-center hover:shadow-md transition-shadow">
+                                                    <div>
+                                                        <div className="font-bold text-gray-700 flex items-center gap-2">
+                                                            <Clock className="w-4 h-4 text-gray-400" /> 
+                                                            {new Date(historyItem.timestamp).toLocaleString()}
+                                                        </div>
+                                                        <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                                            <Users className="w-3 h-3" /> 當時狀態共 <span className="font-bold text-blue-600">{historyItem.count}</span> 筆資料
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => restoreHistory(historyItem)} className="px-4 py-2 bg-green-50 text-green-700 border border-green-200 rounded font-bold text-sm hover:bg-green-100 flex items-center gap-2 transition-colors shadow-sm">
+                                                        <RotateCcw className="w-4 h-4" /> 覆蓋並還原至此狀態
+                                                    </button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             );
         };
@@ -2803,7 +2951,7 @@
 
                 <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} prizes={prizes} setPrizes={setPrizes} currentPrizeId={currentPrizeId} setCurrentPrizeId={setCurrentPrizeId} globalWinnersCount={globalWinners.size} onExportCSV={exportToCSV} onFullReset={handleFullReset} onFactoryReset={handleFactoryReset} onExportBackup={handleExportBackup} onImportBackup={handleImportBackup} settingsTab={settingsTab} setSettingsTab={setSettingsTab} theme={theme} absentWinners={absentWinners} onRestoreAbsent={handleRestoreAbsent} participants={participants} settings={settings} updateSettings={updateSettings} themePresets={themePresets} setThemePresets={setThemePresets} />
                 <DataImportModal isOpen={isDataModalOpen} onClose={() => setIsDataModalOpen(false)} participants={participants} setParticipants={setParticipants} setGlobalWinners={setGlobalWinners} generateMockData={generateMockData} globalWinners={globalWinners} theme={theme} absentWinners={absentWinners} soundConfig={settings.sound} importHistory={importHistory} setImportHistory={setImportHistory} />
-                <ResultModal isOpen={showResultModal} onClose={() => setShowResultModal(false)} currentPrize={currentPrize} currentRoundWinners={currentRoundWinners} theme={theme} allPrizes={prizes} onReplaceWinner={handleBatchAbsence} openConfirm={openConfirm} boxThemeColor={boxThemeColor} soundConfig={settings.sound} />
+                <ResultModal isOpen={showResultModal} onClose={() => setShowResultModal(false)} currentPrize={currentPrize} currentRoundWinners={currentRoundWinners} theme={theme} allPrizes={prizes} onReplaceWinner={handleBatchAbsence} openConfirm={openConfirm} boxThemeColor={boxThemeColor} boxBackgroundColor={settings.boxBackgroundColor} resultModalBgColor={settings.resultModalBgColor} resultCardBgColor={settings.resultCardBgColor} resultCardTextColor={settings.resultCardTextColor} soundConfig={settings.sound} />
                 <BackupConfirmModal pendingBackup={pendingBackup} setPendingBackup={setPendingBackup} confirmRestoreBackup={confirmRestoreBackup} />
                 <ConfirmModal isOpen={confirmModal.isOpen} title={confirmModal.title} message={confirmModal.message} onConfirm={confirmModal.onConfirm} onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} soundConfig={settings.sound} />
                 </div>
