@@ -701,6 +701,131 @@
             50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
         }
 
+        /* --- 新增：嘉年華蓄力特效 (Carnival Charge Effect) --- */
+        @keyframes carnival-disco-spin {
+            0% { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); filter: hue-rotate(360deg); }
+        }
+        @keyframes carnival-charge-beam {
+            0% { transform: rotate(0deg); opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { transform: rotate(360deg); opacity: 0.5; }
+        }
+        @keyframes carnival-mini-balloon {
+            0% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+            20% { opacity: 1; transform: translate(calc(var(--tx) * 0.4), calc(var(--ty) * 0.4)) scale(1); }
+            100% { transform: translate(var(--tx), calc(var(--ty) - 250px)) scale(1.5); opacity: 0; }
+        }
+
+        /* --- 新增：嘉年華 3 秒高潮爆發特效 --- */
+        @keyframes carnival-core-explode {
+            0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+            5% { transform: scale(1.5); filter: brightness(2); opacity: 1; }
+            100% { transform: scale(25); opacity: 0; filter: brightness(4); }
+        }
+        @keyframes carnival-climax-flash {
+            0% { opacity: 0; background: #ffffff; }
+            2% { opacity: 0.9; background: #ffffff; }
+            100% { opacity: 0; background: #fbcfe8; }
+        }
+        @keyframes carnival-climax-shockwave {
+            0% { transform: scale(0); opacity: 0; border-width: 150px; filter: hue-rotate(0deg); }
+            5% { opacity: 1; }
+            100% { transform: scale(8); opacity: 0; border-width: 0px; filter: hue-rotate(360deg); }
+        }
+        @keyframes carnival-climax-blast-rays {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            5% { opacity: 1; transform: scale(1) rotate(20deg); }
+            100% { transform: scale(5) rotate(90deg); opacity: 0; }
+        }
+
+        .carnival-climax-screen {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 5000px; height: 5000px; /* 超大尺寸確保覆蓋全螢幕 */
+            transform: translate(-50%, -50%);
+            background: white;
+            opacity: 0;
+            animation: carnival-climax-flash 1.5s ease-out forwards 3s; /* 精準 3 秒延遲觸發 */
+            pointer-events: none;
+            z-index: 999;
+        }
+        .carnival-climax-ring {
+            position: absolute;
+            width: 300px; height: 300px;
+            border: 150px solid #ec4899;
+            border-radius: 50%;
+            opacity: 0;
+            animation: carnival-climax-shockwave 1.5s cubic-bezier(0.1, 0.8, 0.2, 1) forwards 3s;
+            pointer-events: none;
+            z-index: 25;
+        }
+        .carnival-climax-rays {
+            position: absolute;
+            width: 600px; height: 600px;
+            background: repeating-conic-gradient(from 0deg, #38bdf8 0deg 15deg, transparent 15deg 30deg, #e879f9 30deg 45deg, transparent 45deg 60deg, #facc15 60deg 75deg, transparent 75deg 90deg);
+            border-radius: 50%;
+            mask-image: radial-gradient(circle, transparent 20%, black 50%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle, transparent 20%, black 50%, transparent 70%);
+            opacity: 0;
+            animation: carnival-climax-blast-rays 2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards 3s;
+            pointer-events: none;
+            z-index: 24;
+        }
+
+        .carnival-charge-core {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 3秒時觸發爆炸，放大 25 倍炸穿螢幕，最後停留在 opacity: 0 隱藏 */
+            animation: carnival-core-explode 0.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards 3s;
+            z-index: 20;
+        }
+
+        .effect-carnival {
+            mix-blend-mode: screen;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .carnival-disco-ball {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff, #ec4899, #06b6d4);
+            box-shadow: 0 0 40px #ec4899, inset 0 0 20px #06b6d4;
+            animation: carnival-disco-spin 0.8s linear infinite;
+            z-index: 20;
+        }
+        .carnival-charge-beams {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(232, 121, 249, 0.8) 20deg, transparent 40deg, transparent 90deg, rgba(56, 189, 248, 0.8) 110deg, transparent 130deg, transparent 180deg, rgba(250, 204, 21, 0.8) 200deg, transparent 220deg, transparent 270deg, rgba(74, 222, 128, 0.8) 290deg, transparent 310deg, transparent 360deg);
+            border-radius: 50%;
+            mask-image: radial-gradient(circle, transparent 10%, black 40%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle, transparent 10%, black 40%, transparent 70%);
+            animation: carnival-charge-beam 2s linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .carnival-charge-balloon {
+            position: absolute;
+            width: 24px;
+            height: 32px;
+            background: var(--bg-color);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            animation: carnival-mini-balloon 1.2s ease-out infinite;
+            z-index: 15;
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.2);
+        }
+        .carnival-charge-balloon::after {
+            content: ''; position: absolute; bottom: -4px; left: 10px; width: 4px; height: 6px; background: var(--bg-color); filter: brightness(0.7);
+        }
+
     </style>
 </head>
 <body>
@@ -864,6 +989,7 @@
             toystory: { id: 'toystory', name: '玩具總動員', className: 'effect-toystory' }, 
             surprise_party: { id: 'surprise_party', name: '驚喜派對', className: 'effect-toystory' },
             toystory_buzz: { id: 'toystory_buzz', name: '巴斯光年', className: 'effect-buzz' },
+            carnival: { id: 'carnival', name: '狂歡嘉年華', className: 'effect-carnival' },
         };
 
         const BOX_THEME_COLORS = [
@@ -882,7 +1008,8 @@
                 default: { id: 'default', name: '能量' },
                 wind: { id: 'wind', name: '風聲' },
                 buzz_wind: { id: 'buzz_wind', name: '巴斯風暴' },
-                toystory: { id: 'toystory', name: '玩具總動員' }
+                toystory: { id: 'toystory', name: '玩具總動員' },
+                carnival: { id: 'carnival', name: '狂歡嘉年華' }
             }
         };
 
@@ -1058,6 +1185,126 @@
                     soundManager.chargeOsc2.connect(soundManager.chargeGain2);
                     soundManager.chargeGain2.connect(soundManager.ctx.destination);
                     soundManager.chargeOsc2.start();
+                }
+                else if (variant === 'carnival') {
+                    // --- 狂歡嘉年華 (深沉史詩改版) 音效 ---
+                    duration = 3.0;
+                    
+                    // 1. 主體低頻引擎聲 (Deep Engine Sweep)
+                    const osc = soundManager.ctx.createOscillator();
+                    osc.type = 'triangle'; // 使用三角波，聲音比較圓潤厚實
+                    
+                    // 頻率變化：從極低的 40Hz 緩慢爬升到 150Hz
+                    osc.frequency.setValueAtTime(40, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + duration);
+                    
+                    // 疊加一個稍微失真的方波增加顆粒感
+                    const osc2 = soundManager.ctx.createOscillator();
+                    osc2.type = 'square';
+                    osc2.frequency.setValueAtTime(39, now); // 稍微 detune 產生厚度
+                    osc2.frequency.exponentialRampToValueAtTime(148, now + duration);
+                    
+                    const mixGain = soundManager.ctx.createGain();
+                    mixGain.gain.value = 0.5;
+                    
+                    osc.connect(mixGain);
+                    osc2.connect(mixGain);
+
+                    // 2. 濾波器掃頻 (Filter Sweep) - 讓聲音從悶變亮
+                    const filter = soundManager.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.Q.value = 8; // 增加共振，讓掃頻更有感
+                    filter.frequency.setValueAtTime(100, now);
+                    filter.frequency.exponentialRampToValueAtTime(2000, now + duration);
+                    
+                    mixGain.connect(filter);
+                    sourceNode = filter;
+
+                    // 3. 極低頻脈動 (LFO Tremolo) - 取代原本的急促鼓點
+                    const lfo = soundManager.ctx.createOscillator();
+                    const lfoGain = soundManager.ctx.createGain();
+                    lfo.type = 'sine';
+                    // 脈動速度從 2Hz 加快到 12Hz
+                    lfo.frequency.setValueAtTime(2, now);
+                    lfo.frequency.exponentialRampToValueAtTime(12, now + duration);
+                    
+                    // LFO 控制主音量 (產生 Womp-Womp 的感覺)
+                    lfoGain.gain.value = 0.6; // 脈動深度
+                    lfo.connect(lfoGain.gain);
+                    lfo.start(now);
+                    soundManager.trackNode(lfo);
+
+                    // 將 LFO 應用到最終輸出的 Gain 上
+                    const tremoloNode = soundManager.ctx.createGain();
+                    tremoloNode.gain.value = 0.4; // 基礎音量
+                    filter.connect(tremoloNode);
+                    tremoloNode.connect(soundManager.chargeGain);
+                    
+                    // 重新指向，讓停止機制能抓到這些 oscillator
+                    soundManager.chargeOsc = osc;
+                    soundManager.chargeOsc2 = osc2;
+                    osc2.start(now);
+
+                    // --- 3 秒高潮爆發：巨型派對銅管和弦 + 拉炮爆裂 (Synth Brass & Noise Crash) ---
+                    const climaxTime = now + 3.0;
+
+                    // A. 巨型派對銅管和弦 (Synth Brass)
+                    // 使用 C大調和弦加上八度音疊加 (C4, E4, G4, C5, E5)，增加聲音厚度與華麗感
+                    const chord = [261.63, 329.63, 392.00, 523.25, 659.25]; 
+                    chord.forEach((freq) => {
+                        const chordOsc = soundManager.ctx.createOscillator();
+                        const chordGain = soundManager.ctx.createGain();
+                        chordOsc.type = 'sawtooth'; // 鋸齒波最適合做銅管合成器
+                        chordOsc.frequency.value = freq;
+                        chordOsc.detune.value = Math.random() * 15 - 7.5; // 加上些微失真(Detune)，讓和弦聽起來更寬廣
+
+                        chordGain.gain.setValueAtTime(0, climaxTime);
+                        chordGain.gain.linearRampToValueAtTime(0.15, climaxTime + 0.05); // 瞬間爆發
+                        chordGain.gain.exponentialRampToValueAtTime(0.01, climaxTime + 2.0); // 緩慢消散
+
+                        // 加入濾波器，讓高潮音效聽起來從明亮逐漸變柔和
+                        const brassFilter = soundManager.ctx.createBiquadFilter();
+                        brassFilter.type = 'lowpass';
+                        brassFilter.frequency.setValueAtTime(4000, climaxTime); 
+                        brassFilter.frequency.exponentialRampToValueAtTime(400, climaxTime + 1.5);
+
+                        chordOsc.connect(brassFilter);
+                        brassFilter.connect(chordGain);
+                        chordGain.connect(soundManager.ctx.destination);
+                        
+                        chordOsc.start(climaxTime);
+                        chordOsc.stop(climaxTime + 2.0);
+                        soundManager.trackNode(chordOsc);
+                    });
+
+                    // B. 拉炮爆裂的白噪音 (Noise Crash)
+                    const crashDuration = 2.0;
+                    const bufferSize = soundManager.ctx.sampleRate * crashDuration;
+                    const buffer = soundManager.ctx.createBuffer(1, bufferSize, soundManager.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    // 隨機填充產生白噪音
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = soundManager.ctx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    // 使用帶通濾波器，模擬紙花拉炮那種帶有「ㄘ」聲的高頻爆裂
+                    const noiseFilter = soundManager.ctx.createBiquadFilter();
+                    noiseFilter.type = 'bandpass';
+                    noiseFilter.frequency.value = 1200;
+                    noiseFilter.Q.value = 0.5;
+
+                    const noiseGain = soundManager.ctx.createGain();
+                    noiseGain.gain.setValueAtTime(0, climaxTime);
+                    noiseGain.gain.linearRampToValueAtTime(0.6, climaxTime + 0.02); // 0.02秒瞬間最大聲
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, climaxTime + crashDuration); // 跟著銅管一起消散
+
+                    noise.connect(noiseFilter);
+                    noiseFilter.connect(noiseGain);
+                    noiseGain.connect(soundManager.ctx.destination);
+                    noise.start(climaxTime);
+                    soundManager.trackNode(noise);
                 }
                 else if (variant === 'toystory') {
                     duration = 5.0; 
@@ -3217,11 +3464,34 @@
                 </div>
 
                 {isLongPressing && (
-                    <div className={`effect-charge-overlay ${!['toystory','surprise_party','toystory_buzz','implode'].includes(charge.type) ? (CHARGE_EFFECTS[charge.type]?.className || 'effect-flash') : ''} ${['toystory', 'surprise_party'].includes(charge.type) ? 'effect-toystory' : ''} ${charge.type === 'toystory_buzz' ? 'effect-buzz' : ''} ${charge.type === 'implode' ? 'effect-implode' : ''}`} style={{ '--charge-scale': 1.0 + (charge.intensity / 100) * 1.5, top: `${effectPos.y + (charge.y - 50) * 4}px`, left: `${effectPos.x + (charge.x - 50) * 4}px` }}>
+                    <div className={`effect-charge-overlay ${!['toystory','surprise_party','toystory_buzz','implode','carnival'].includes(charge.type) ? (CHARGE_EFFECTS[charge.type]?.className || 'effect-flash') : ''} ${['toystory', 'surprise_party'].includes(charge.type) ? 'effect-toystory' : ''} ${charge.type === 'toystory_buzz' ? 'effect-buzz' : ''} ${charge.type === 'implode' ? 'effect-implode' : ''} ${charge.type === 'carnival' ? 'effect-carnival' : ''}`} style={{ '--charge-scale': 1.0 + (charge.intensity / 100) * 1.5, top: `${effectPos.y + (charge.y - 50) * 4}px`, left: `${effectPos.x + (charge.x - 50) * 4}px` }}>
                         {charge.type === 'implode' && (<><div className="implode-ring" style={{ width: '100%', height: '100%', animationDelay: '0s', borderColor: '#a855f7' }}></div><div className="implode-ring" style={{ width: '80%', height: '80%', animationDelay: '0.2s', borderColor: '#22c55e' }}></div><div className="implode-ring" style={{ width: '60%', height: '60%', animationDelay: '0.4s', borderColor: '#3b82f6' }}></div><div className="implode-ring" style={{ width: '40%', height: '40%', animationDelay: '0.6s', borderColor: '#ec4899' }}></div></>)}
                         {charge.type === 'toystory' && (<><div className="toy-rainbow-wrapper"><div className="toy-rainbow-rays"></div></div><div className="toy-badge-container"><div className="toy-badge-star"><Star size={80} className="text-red-500" fill="currentColor" /></div></div>{[...Array(8)].map((_, i) => { const toys = ['🚀', '🦖', '🥔', '👽', '🧸', '🐖', '🐶', '📦']; const angle = (i / 8) * Math.PI * 2; const dist = 300; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="toy-particle" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${i * 0.1}s` }}>{toys[i % toys.length]}</div>); })}</>)}
                         {charge.type === 'surprise_party' && (<><div className="toy-rainbow-wrapper"><div className="toy-rainbow-rays"></div></div><div className="relative flex justify-center items-center z-20" style={{ animation: 'toy-badge-bounce 0.6s ease-in-out infinite' }}><img src="images/party-icon.png" className="w-[140px] h-[140px] object-contain" style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.3))' }} alt="party" /></div>{[...Array(8)].map((_, i) => { const images = ['images/party-01.png', 'images/party-02.png', 'images/party-03.png', 'images/party-04.png', 'images/party-05.png', 'images/party-06.png', 'images/party-07.png', 'images/party-08.png']; const angle = (i / 8) * Math.PI * 2; const dist = 300; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="toy-particle" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${i * 0.1}s` }}><img src={images[i]} className="w-[70px] h-[70px] object-contain" alt="particle" /></div>); })}</>)}
                         {charge.type === 'toystory_buzz' && (<div className="buzz-container"><div className="buzz-flying-group"><div className="buzz-jet-beam"></div><div className="buzz-wings"><div className="buzz-wing-left"><div className="buzz-wing-stripes"></div></div><div className="buzz-wing-right"><div className="buzz-wing-stripes"></div></div></div><div className="buzz-ring-purple"></div><div className="buzz-ring-green"></div><div className="buzz-core"><Star size={50} className="text-red-500 drop-shadow-sm" fill="#ef4444" /></div></div><div className="buzz-aftermath"><div className="buzz-smoke"></div>{[...Array(6)].map((_, i) => { const angle = (i / 6) * Math.PI * 2; const dist = 60 + Math.random() * 40; const tx = Math.cos(angle) * dist; const ty = Math.sin(angle) * dist; return (<div key={i} className="buzz-star" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, animationDelay: `${3.1 + Math.random() * 0.2}s` }}><Star size={20 + Math.random() * 15} fill="currentColor" /></div>); })}</div></div>)}
+                        {charge.type === 'carnival' && (
+                            <>
+                                <div className="carnival-charge-core">
+                                    <div className="carnival-charge-beams"></div>
+                                    <div className="carnival-disco-ball"></div>
+                                </div>
+                                {[...Array(16)].map((_, i) => { 
+                                    const angle = (i / 16) * Math.PI * 2; 
+                                    const dist = 180 + Math.random() * 100; 
+                                    const tx = Math.cos(angle) * dist; 
+                                    const ty = Math.sin(angle) * dist; 
+                                    const colors = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#A855F7', '#EC4899', '#14B8A6'];
+                                    const color = colors[i % colors.length];
+                                    return (
+                                        <div key={`c-ball-${i}`} className="carnival-charge-balloon" style={{ '--tx': `${tx}px`, '--ty': `${ty}px`, '--bg-color': color, animationDelay: `${Math.random() * 1.5}s` }}></div>
+                                    ); 
+                                })}
+                                {/* 新增：3 秒高潮爆發層 (全螢幕閃光、巨大震波、四射光芒) */}
+                                <div className="carnival-climax-screen"></div>
+                                <div className="carnival-climax-ring"></div>
+                                <div className="carnival-climax-rays"></div>
+                            </>
+                        )}
                     </div>
                 )}
 
