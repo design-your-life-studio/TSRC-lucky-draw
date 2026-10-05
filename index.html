@@ -564,6 +564,43 @@
             text-shadow: 0 0 10px rgba(34, 211, 238, 0.8), 0 0 20px rgba(34, 211, 238, 0.4);
         }
         
+        /* --- 新增：嘉年華 (Carnival) 背景動畫 --- */
+        @keyframes balloon-float {
+            0% { transform: translateY(110vh) rotate(-5deg); opacity: 0; }
+            10% { opacity: 0.95; }
+            50% { transform: translateY(-10vh) rotate(5deg); }
+            90% { opacity: 0.95; }
+            100% { transform: translateY(-130vh) rotate(-5deg); opacity: 0; }
+        }
+        @keyframes spotlight-sweep {
+            0% { transform: rotate(-60deg); opacity: 0; }
+            15% { opacity: 1; }
+            50% { transform: rotate(60deg); opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: rotate(-60deg); opacity: 0; }
+        }
+        .carnival-spotlight {
+            position: absolute;
+            bottom: -15vh;
+            width: 80vw;
+            height: 150vh;
+            margin-left: -40vw; /* 讓光束中心點精準對齊發射源 */
+            clip-path: polygon(25% 0, 75% 0, 51% 100%, 49% 100%); /* 裁切出銳利的立體錐形光束 */
+            transform-origin: bottom center;
+            filter: blur(8px) drop-shadow(0 0 15px rgba(255,255,255,0.5));
+            pointer-events: none;
+            mix-blend-mode: screen; /* 關鍵：產生夜店光束交錯時的疊加爆亮感 */
+            z-index: 5;
+        }
+        .carnival-spotlight::after { /* 光束中心的超亮核心 */
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.7) 20%, transparent 80%);
+            clip-path: polygon(45% 0, 55% 0, 50.5% 100%, 49.5% 100%);
+            filter: blur(3px);
+        }
+        
         /* 玩具總動員 (Toy Story) 抽獎動畫 */
         @keyframes etch-shake {
             0%, 100% { transform: rotate(0deg) translate(0,0); }
@@ -653,6 +690,15 @@
             background-size: contain;
             background-repeat: no-repeat;
             filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
+        }
+
+        /* --- 星空 (Starry Sky) 背景動畫 --- */
+        .bg-starry {
+            background: radial-gradient(ellipse at bottom, #0f172a 0%, #020617 100%);
+        }
+        @keyframes star-twinkle {
+            0%, 100% { opacity: 0.1; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
         }
 
     </style>
@@ -789,17 +835,19 @@
         const BG_ANIMATIONS = {
             none: { id: 'none', name: '白底' }, 
             black: { id: 'black', name: '黑底' },
+            starry: { id: 'starry', name: '浩瀚星空' },
             sparkles: { id: 'sparkles', name: '流金歲月' },
             aurora: { id: 'aurora', name: '極光流動' },
             confetti: { id: 'confetti', name: '繽紛彩帶' },
-            toystory: { id: 'toystory', name: '玩具總動員' }
+            toystory: { id: 'toystory', name: '玩具總動員' },
+            carnival: { id: 'carnival', name: '狂歡嘉年華' }
         };
 
         const SPIN_ANIMATIONS = {
             scroll: { id: 'scroll', name: '直式跑馬燈 (預設)' },
             slot: { id: 'slot', name: '幸運老虎機' },
             toy_story: { id: 'toy_story', name: '玩具總動員' },
-            decode: { id: 'decode', name: '科技解碼' }
+            decode: { id: 'decode', name: '科技解碼 (Hack)' }
         };
 
         const TITLE_ANIMATIONS = {
@@ -2488,7 +2536,36 @@
                 const generateSparkles = (count) => [...Array(count)].map((_, i) => { const angle = Math.random() * Math.PI * 2; const distance = 80 + Math.random() * 70; return { id: i, tx: (Math.cos(angle) * distance).toFixed(2) + 'vw', ty: (Math.sin(angle) * distance).toFixed(2) + 'vh', duration: 3 + Math.random() * 3, delay: Math.random() * 3, size: 15 + Math.random() * 35 }; });
                 const generateClouds = (count) => [...Array(count)].map((_, i) => ({ id: i, top: Math.random() * 90, scale: 0.6 + Math.random() * 0.8, duration: 30 + Math.random() * 40, delay: -Math.random() * 60 }));
                 const generateToys = (count) => [...Array(count)].map((_, i) => ({ id: i, char: ['🧸', '🚀', '🦖', '🚗', '🎈', '🤖', '👑', '🚂', '🥁', '⚽'][Math.floor(Math.random() * 10)], left: Math.random() * 100, duration: 12 + Math.random() * 12, delay: Math.random() * 10, size: 24 + Math.random() * 30 }));
-                return { sparkles: generateSparkles(40), confetti: generate(30, 5, 10, 0, 0), toystory: generateClouds(12), toystoryToys: generateToys(20), };
+                
+                // 新增：嘉年華氣球與探照燈生成器
+                const generateBalloons = (count) => [...Array(count)].map((_, i) => ({ id: i, left: Math.random() * 100, duration: 12 + Math.random() * 15, delay: Math.random() * 10, size: 30 + Math.random() * 40, color: ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#A855F7', '#EC4899', '#14B8A6'][Math.floor(Math.random() * 7)] }));
+                const generateSpotlights = () => [ 
+                    { id: 1, left: '15%', duration: 4.2, delay: 0, color: 'rgba(34, 211, 238, 0.6)' },   /* 賽博青 */
+                    { id: 2, left: '35%', duration: 5.8, delay: -2, color: 'rgba(232, 121, 249, 0.6)' },  /* 霓虹粉 */
+                    { id: 3, left: '50%', duration: 4.5, delay: -1, color: 'rgba(255, 255, 255, 0.5)' },   /* 亮白 */
+                    { id: 4, left: '65%', duration: 6.1, delay: -3.5, color: 'rgba(56, 189, 248, 0.6)' }, /* 螢光藍 */
+                    { id: 5, left: '85%', duration: 5.2, delay: -4, color: 'rgba(250, 204, 21, 0.6)' }    /* 耀眼黃 */
+                ];
+                
+                // 新增：星空生成器
+                const generateStars = (count) => [...Array(count)].map((_, i) => ({
+                    id: `star-${i}`,
+                    left: Math.random() * 100,
+                    top: Math.random() * 100,
+                    size: Math.random() * 2 + 1, // 1 到 3px
+                    duration: 2 + Math.random() * 4, // 2s 到 6s
+                    delay: Math.random() * 5
+                }));
+
+                return { 
+                    sparkles: generateSparkles(40), 
+                    confetti: generate(30, 5, 10, 0, 0), 
+                    toystory: generateClouds(12), 
+                    toystoryToys: generateToys(20),
+                    carnivalBalloons: generateBalloons(35),
+                    carnivalSpotlights: generateSpotlights(),
+                    starryStars: generateStars(200)
+                };
             }, []);
 
             const toggleFullscreen = () => {
@@ -2913,8 +2990,8 @@
                     <div className="p-4 border-t border-gray-200 bg-white grid grid-cols-2 gap-2"><button onClick={() => { setIsSettingsOpen(true); setSettingsTab('prizes'); soundManager.playClick(settings.sound.click); }} className="flex items-center justify-center gap-2 p-2 rounded text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"><Settings className="w-4 h-4" /> 設定</button><button onClick={() => { setIsDataModalOpen(true); soundManager.playClick(settings.sound.click); }} className="flex items-center justify-center gap-2 p-2 rounded text-sm bg-gray-100 hover:bg-gray-200 text-gray-700"><Users className="w-4 h-4" /> 名單</button></div>
                 </div>
 
-                <div className={`flex-1 flex flex-col relative overflow-hidden ${backgroundImage ? 'bg-custom' : (bgAnimation === 'none' ? 'bg-gray-50' : bgAnimation === 'black' ? 'bg-black' : bgAnimation === 'aurora' ? 'bg-aurora' : bgAnimation === 'toystory' ? 'bg-toystory' : 'bg-gray-900')}`} style={backgroundImage ? { backgroundImage: `url('${backgroundImage}')` } : {}}>
-                    <div className={`absolute top-0 left-0 w-full h-full ${backgroundImage ? '' : (['none','black','aurora','toystory'].includes(bgAnimation) ? '' : `bg-gradient-to-b ${theme.bgGradient} opacity-90`)} z-0 pointer-events-none`}></div>
+                <div className={`flex-1 flex flex-col relative overflow-hidden ${backgroundImage ? 'bg-custom' : (bgAnimation === 'none' ? 'bg-gray-50' : bgAnimation === 'black' ? 'bg-black' : bgAnimation === 'aurora' ? 'bg-aurora' : bgAnimation === 'toystory' ? 'bg-toystory' : (bgAnimation === 'starry' || bgAnimation === 'carnival') ? 'bg-starry' : 'bg-gray-900')}`} style={backgroundImage ? { backgroundImage: `url('${backgroundImage}')` } : {}}>
+                    <div className={`absolute top-0 left-0 w-full h-full ${backgroundImage ? '' : (['none','black','aurora','toystory','starry','carnival'].includes(bgAnimation) ? '' : `bg-gradient-to-b ${theme.bgGradient} opacity-90`)} z-0 pointer-events-none`}></div>
                     <button onClick={toggleFullscreen} className="absolute top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 shadow-sm" title={isFullscreen ? "退出全螢幕 (Esc)" : "進入全螢幕"}>{isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}</button>
                     {!isSidebarOpen && (<button onClick={() => setIsSidebarOpen(true)} className="absolute top-4 left-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-all backdrop-blur-sm border border-white/20 shadow-sm animate-fade-in" title="展開側邊欄"><Menu className="w-5 h-5" /></button>)}
                     
@@ -2936,6 +3013,41 @@
                                 </div>
                             ))}
                             {bgAnimation === 'toystory' && particleConfig.toystoryToys.map((p) => (<div key={`toy-${p.id}`} className="absolute select-none opacity-90" style={{ left: `${p.left}%`, bottom: '-30px', fontSize: `${p.size}px`, filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.1))', animation: `toy-float-up ${p.duration}s linear infinite`, animationDelay: `${p.delay}s` }}>{p.char}</div>))}
+                            
+                            {/* 浩瀚星空背景特效 (Carnival 狂歡嘉年華也共用星空底層) */}
+                            {(bgAnimation === 'starry' || bgAnimation === 'carnival') && particleConfig.starryStars.map((s) => (
+                                <div key={s.id} className="absolute bg-white rounded-full" style={{
+                                    left: `${s.left}%`,
+                                    top: `${s.top}%`,
+                                    width: `${s.size}px`,
+                                    height: `${s.size}px`,
+                                    animation: `star-twinkle ${s.duration}s ease-in-out infinite`,
+                                    animationDelay: `${s.delay}s`
+                                }}></div>
+                            ))}
+
+                            {/* 嘉年華背景特效 (探照燈與氣球) */}
+                            {bgAnimation === 'carnival' && (
+                                <>
+                                    {particleConfig.carnivalSpotlights.map(s => (
+                                        <div key={`spot-${s.id}`} className="carnival-spotlight" style={{ left: s.left, background: `linear-gradient(to top, rgba(255,255,255,0.9) 0%, ${s.color} 30%, transparent 80%)`, animation: `spotlight-sweep ${s.duration}s ease-in-out infinite alternate`, animationDelay: `${s.delay}s` }}></div>
+                                    ))}
+                                    {particleConfig.carnivalBalloons.map(b => (
+                                        <div key={`balloon-${b.id}`} className="absolute" style={{ left: `${b.left}%`, bottom: '-20vh', animation: `balloon-float ${b.duration}s ease-in-out infinite`, animationDelay: `${b.delay}s` }}>
+                                            <svg width={b.size} height={b.size * 1.5} viewBox="0 0 50 80" fill={b.color} style={{ filter: 'drop-shadow(0 6px 8px rgba(0,0,0,0.3))' }}>
+                                                {/* 氣球本體 */}
+                                                <path d="M25 0C11 0 0 11 0 25c0 18 20 35 25 45 5-10 25-27 25-45C50 11 39 0 25 0z" />
+                                                {/* 氣球打結處 */}
+                                                <path d="M25 65 l-4 10 h8 z" fill={b.color} filter="brightness(0.7)"/>
+                                                {/* 氣球線 */}
+                                                <path d="M25 75 q -5 10 5 20" stroke="rgba(255,255,255,0.4)" strokeWidth="1" fill="none"/>
+                                                {/* 反光效果 */}
+                                                <ellipse cx="15" cy="15" rx="4" ry="10" fill="white" opacity="0.3" transform="rotate(-30 15 15)"/>
+                                            </svg>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
                         </div>
                     )}
 
