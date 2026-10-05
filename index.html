@@ -581,11 +581,11 @@
         }
         .carnival-spotlight {
             position: absolute;
-            bottom: -15vh;
-            width: 80vw;
-            height: 150vh;
-            margin-left: -40vw; /* 讓光束中心點精準對齊發射源 */
-            clip-path: polygon(25% 0, 75% 0, 51% 100%, 49% 100%); /* 裁切出銳利的立體錐形光束 */
+            bottom: -40vh; /* 整體大幅下移，確保底部平坦的發射源完全在畫面外 */
+            width: 120vw;  /* 加寬以適應高度增加 */
+            height: 250vh; /* 大幅拉長光束，避免左右搖擺時頂部邊緣穿幫 (破圖) */
+            margin-left: -60vw; /* 寬度的一半，讓光束中心點精準對齊發射源 */
+            clip-path: polygon(30% 0, 70% 0, 51% 100%, 49% 100%); /* 調整裁切比例維持銳利錐形 */
             transform-origin: bottom center;
             filter: blur(8px) drop-shadow(0 0 15px rgba(255,255,255,0.5));
             pointer-events: none;
@@ -596,8 +596,8 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.7) 20%, transparent 80%);
-            clip-path: polygon(45% 0, 55% 0, 50.5% 100%, 49.5% 100%);
+            background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.7) 15%, transparent 70%); /* 配合新高度調整光衰減比例 */
+            clip-path: polygon(46% 0, 54% 0, 50.5% 100%, 49.5% 100%);
             filter: blur(3px);
         }
         
@@ -844,14 +844,14 @@
         };
 
         const SPIN_ANIMATIONS = {
-            scroll: { id: 'scroll', name: '直式跑馬燈 (預設)' },
+            scroll: { id: 'scroll', name: '直式跑馬燈' },
             slot: { id: 'slot', name: '幸運老虎機' },
             toy_story: { id: 'toy_story', name: '玩具總動員' },
-            decode: { id: 'decode', name: '科技解碼 (Hack)' }
+            decode: { id: 'decode', name: '科技解碼' }
         };
 
         const TITLE_ANIMATIONS = {
-            none: { id: 'none', name: '靜止 (預設)' },
+            none: { id: 'none', name: '靜止' },
             pulse: { id: 'pulse', name: '呼吸燈' },
             shine: { id: 'shine', name: '流光掃過' },
             float: { id: 'float', name: '波浪浮動' },
