@@ -2133,10 +2133,30 @@
                                             <div className="mb-4"><label className="text-xs font-bold text-gray-500 mb-1 block">按鈕顯示文字</label><input type="text" value={settings.startButtonText} onChange={(e) => updateSettings({ startButtonText: e.target.value })} className="w-full px-3 py-2 border rounded text-sm focus:ring-2 focus:ring-red-500 outline-none bg-white" maxLength={10}/></div>
                                             <div className="mb-4">
                                                 <label className="text-xs font-bold text-gray-500 mb-2 block">外框邊線顏色</label>
-                                                <div className="flex flex-wrap gap-2">
+                                                <div className="flex flex-wrap gap-2 mb-3">
                                                     {BOX_THEME_COLORS.map((c) => (
                                                         <button key={c.id} onClick={() => { updateSettings({ boxThemeColor: c.value }); soundManager.playClick(settings.sound.click); }} className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${settings.boxThemeColor === c.value ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : 'border-transparent'}`} style={{ backgroundColor: c.value }} title={c.name}/>
                                                     ))}
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <input 
+                                                        type="color" 
+                                                        value={settings.boxThemeColor || '#FACC15'} 
+                                                        onChange={(e) => updateSettings({ boxThemeColor: e.target.value })} 
+                                                        className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                    />
+                                                    <input 
+                                                        type="text" 
+                                                        value={settings.boxThemeColor || '#FACC15'} 
+                                                        onChange={(e) => updateSettings({ boxThemeColor: e.target.value })} 
+                                                        className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all uppercase"
+                                                    />
+                                                    <button 
+                                                        onClick={() => updateSettings({ boxThemeColor: '#FACC15' })} 
+                                                        className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                    >
+                                                        恢復預設
+                                                    </button>
                                                 </div>
                                             </div>
 
