@@ -853,6 +853,8 @@
             spinAnimation: 'toy_story',
             titleAnimation: 'shine',
             startButtonText: "START",
+            startButtonBgColor: '#EAB308', // 新增：START 按鈕背景色
+            drawButtonBgColor: '#EAB308',  // 新增：立即抽獎按鈕背景色
             boxThemeColor: '#FACC15',
             boxBackgroundColor: '#2563EB', // 新增：中間抽獎區塊背景色預設為藍色
             resultModalBgColor: '#FACC15', // 新增：中獎視窗背景色 (預設黃色)
@@ -2240,6 +2242,56 @@
                                                         </button>
                                                     </div>
                                                 </div>
+                                                
+                                                {/* 5. START 按鈕背景色 */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-500 mb-2 block">START 按鈕背景色</label>
+                                                    <div className="flex items-center gap-3">
+                                                        <input 
+                                                            type="color" 
+                                                            value={settings.startButtonBgColor || '#EAB308'} 
+                                                            onChange={(e) => updateSettings({ startButtonBgColor: e.target.value })} 
+                                                            className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            value={settings.startButtonBgColor || '#EAB308'} 
+                                                            onChange={(e) => updateSettings({ startButtonBgColor: e.target.value })} 
+                                                            className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all uppercase"
+                                                        />
+                                                        <button 
+                                                            onClick={() => updateSettings({ startButtonBgColor: '#EAB308' })} 
+                                                            className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                        >
+                                                            恢復預設
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* 6. 立即抽獎按鈕背景色 */}
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-500 mb-2 block">立即抽獎按鈕背景色</label>
+                                                    <div className="flex items-center gap-3">
+                                                        <input 
+                                                            type="color" 
+                                                            value={settings.drawButtonBgColor || '#EAB308'} 
+                                                            onChange={(e) => updateSettings({ drawButtonBgColor: e.target.value })} 
+                                                            className="w-10 h-10 p-1 border rounded cursor-pointer bg-white shrink-0"
+                                                        />
+                                                        <input 
+                                                            type="text" 
+                                                            value={settings.drawButtonBgColor || '#EAB308'} 
+                                                            onChange={(e) => updateSettings({ drawButtonBgColor: e.target.value })} 
+                                                            className="w-24 text-sm font-mono text-gray-600 px-2 py-1.5 border rounded outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all uppercase"
+                                                        />
+                                                        <button 
+                                                            onClick={() => updateSettings({ drawButtonBgColor: '#EAB308' })} 
+                                                            className="text-xs px-2.5 py-1.5 bg-white border border-gray-300 text-gray-600 rounded hover:bg-gray-100 shadow-sm transition-colors"
+                                                        >
+                                                            恢復預設
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div className="mb-4 border-t border-gray-200 pt-3 mt-3">
@@ -3445,8 +3497,8 @@
                                             </div>
                                         ) : (
                                             <div ref={mainBtnRef} className="relative w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 group cursor-pointer select-none" onMouseDown={handlePressStart} onMouseUp={handlePressEnd} onMouseLeave={handlePressCancel} onTouchStart={handlePressStart} onTouchEnd={handlePressEnd}>
-                                                <div className={`absolute inset-0 ${theme.primary} rounded-full opacity-20 ${buttonAnimation === 'ping' ? 'animate-ping' : ''}`}></div>
-                                                <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.3)] border-4 flex items-center justify-center transform transition-transform duration-200 ${isLongPressing ? 'scale-90' : 'group-hover:scale-105'}`} style={{ borderColor: boxThemeColor }}>
+                                                <div className={`absolute inset-0 rounded-full opacity-20 ${buttonAnimation === 'ping' ? 'animate-ping' : ''}`} style={{ backgroundColor: settings.startButtonBgColor || '#EAB308' }}></div>
+                                                <div className={`absolute inset-0 rounded-full shadow-[0_10px_20px_rgba(0,0,0,0.3)] border-4 flex items-center justify-center transform transition-transform duration-200 ${isLongPressing ? 'scale-90' : 'group-hover:scale-105'}`} style={{ borderColor: boxThemeColor, background: settings.startButtonBgColor || '#EAB308' }}>
                                                     <span className="text-2xl md:text-3xl font-black text-white tracking-widest uppercase">{startButtonText}</span>
                                                 </div>
                                             </div>
@@ -3458,11 +3510,11 @@
                             </div>
                             <div className="flex flex-col items-center gap-3 w-full">
                                 <div className="h-16 flex items-center justify-center w-full">
-                                    <button onMouseDown={handlePressStart} onMouseUp={handlePressEnd} onMouseLeave={handlePressCancel} onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} disabled={isSpinning} className={`px-12 py-4 bg-gradient-to-r ${theme.gradient} text-white text-xl font-bold rounded-full shadow-xl transform transition flex items-center justify-center gap-3 select-none ${isLongPressing ? 'scale-95' : 'hover:-translate-y-1 active:scale-95'} ${isSpinning ? 'invisible pointer-events-none' : ''} ${currentPrize.drawn ? 'invisible pointer-events-none' : 'hover:opacity-90'}`}>立即抽獎</button>
+                                    <button onMouseDown={handlePressStart} onMouseUp={handlePressEnd} onMouseLeave={handlePressCancel} onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} disabled={isSpinning} className={`px-12 py-4 text-white text-xl font-bold rounded-full shadow-xl transform transition flex items-center justify-center gap-3 select-none ${isLongPressing ? 'scale-95' : 'hover:-translate-y-1 active:scale-95'} ${isSpinning ? 'invisible pointer-events-none' : ''} ${currentPrize.drawn ? 'invisible pointer-events-none' : 'hover:opacity-90'}`} style={{ background: settings.drawButtonBgColor || '#EAB308' }}>立即抽獎</button>
                                 </div>
                                 <div className="flex gap-4 items-center justify-center">
                                     <button onClick={handlePrevPrize} disabled={isSpinning} className={`px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg transition-all bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm border border-white/20 text-sm ${isSpinning ? 'invisible pointer-events-none' : ''} ${currentPrizeIndex <= 0 ? 'invisible pointer-events-none' : ''}`}><ChevronLeft className="w-4 h-4" /> 上一個獎項</button>
-                                    <button onClick={handleNextPrize} disabled={isSpinning} className={`px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg transition-all ${currentPrize.drawn ? `bg-gradient-to-r ${theme.gradient} text-white text-xl hover:scale-105 animate-bounce-in` : "bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm border border-white/20 text-sm"} ${isSpinning ? 'invisible pointer-events-none' : ''} ${currentPrizeIndex >= prizes.length - 1 ? 'invisible pointer-events-none' : ''}`}>下一個獎項 <ChevronRight className={currentPrize.drawn ? "w-6 h-6" : "w-4 h-4"} /></button>
+                                    <button onClick={handleNextPrize} disabled={isSpinning} className={`px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg transition-all ${currentPrize.drawn ? "text-white text-xl hover:scale-105 animate-bounce-in" : "bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm border border-white/20 text-sm"} ${isSpinning ? 'invisible pointer-events-none' : ''} ${currentPrizeIndex >= prizes.length - 1 ? 'invisible pointer-events-none' : ''}`} style={currentPrize.drawn ? { background: settings.drawButtonBgColor || '#EAB308' } : {}}>下一個獎項 <ChevronRight className={currentPrize.drawn ? "w-6 h-6" : "w-4 h-4"} /></button>
                                 </div>
                             </div>
                         </div>
