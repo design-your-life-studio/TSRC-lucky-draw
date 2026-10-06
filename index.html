@@ -956,7 +956,7 @@
         };
 
         const DEFAULT_PRESETS = [
-            { id: 'toystory', name: '玩具總動員', theme: 'toystory', bg: 'toystory', charge: 'toystory', sound: 'toystory', spin: 'toy_story', box: '#FACC15' }
+            { id: 'toystory', name: '玩具總動員', theme: 'toystory', bg: 'toystory', charge: 'toystory', sound: 'toystory', spin: 'toy_story', box: '#FACC15', startBtn: '#EAB308', drawBtn: '#EAB308', boxBg: '#2563EB', modalBg: '#FACC15', cardBg: '#2563EB', cardText: '#FFFFFF' }
         ];
 
         const BG_ANIMATIONS = {
@@ -1520,7 +1520,13 @@
                 charge: 'flash',
                 sound: 'default',
                 spin: 'scroll',
-                box: '#FACC15'
+                box: '#FACC15',
+                startBtn: '#EAB308',
+                drawBtn: '#EAB308',
+                boxBg: '#2563EB',
+                modalBg: '#FACC15',
+                cardBg: '#2563EB',
+                cardText: '#FFFFFF'
             });
 
             const handleEditPreset = (preset) => {
@@ -1555,7 +1561,13 @@
                     charge: 'flash',
                     sound: 'default',
                     spin: 'scroll',
-                    box: '#FACC15'
+                    box: '#FACC15',
+                    startBtn: '#EAB308',
+                    drawBtn: '#EAB308',
+                    boxBg: '#2563EB',
+                    modalBg: '#FACC15',
+                    cardBg: '#2563EB',
+                    cardText: '#FFFFFF'
                 });
             };
 
@@ -1578,7 +1590,13 @@
                     charge: settings.charge.type,
                     sound: settings.sound.charge,
                     spin: settings.spinAnimation,
-                    box: settings.boxThemeColor
+                    box: settings.boxThemeColor || '#FACC15',
+                    startBtn: settings.startButtonBgColor || '#EAB308',
+                    drawBtn: settings.drawButtonBgColor || '#EAB308',
+                    boxBg: settings.boxBackgroundColor || '#2563EB',
+                    modalBg: settings.resultModalBgColor || '#FACC15',
+                    cardBg: settings.resultCardBgColor || '#2563EB',
+                    cardText: settings.resultCardTextColor || '#FFFFFF'
                 });
                 setIsAddThemeModalOpen(true);
                 soundManager.playClick(settings.sound.click);
@@ -1731,7 +1749,13 @@
                     bgAnimation: preset.bg,
                     spinAnimation: preset.spin,
                     boxThemeColor: preset.box,
-                    charge: { ...settings.charge, type: preset.charge }
+                    charge: { ...settings.charge, type: preset.charge },
+                    startButtonBgColor: preset.startBtn || '#EAB308',
+                    drawButtonBgColor: preset.drawBtn || '#EAB308',
+                    boxBackgroundColor: preset.boxBg || '#2563EB',
+                    resultModalBgColor: preset.modalBg || '#FACC15',
+                    resultCardBgColor: preset.cardBg || '#2563EB',
+                    resultCardTextColor: preset.cardText || '#FFFFFF'
                 });
                 
                 setTimeout(() => updateSettings({ sound: { ...settings.sound, charge: preset.sound } }), 50);
@@ -2001,18 +2025,38 @@
                                                              <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-2.5 pointer-events-none"/>
                                                          </div>
                                                     </div>
-                                                    <div className="col-span-2">
-                                                         <label className="block text-xs font-bold text-gray-500 mb-1.5">抽獎框顏色</label>
-                                                         <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-gray-50/50 min-h-[42px] items-center">
-                                                             {BOX_THEME_COLORS.map(c => (
-                                                                 <button key={c.id} onClick={() => setNewPreset({...newPreset, box: c.value})} className={`w-6 h-6 rounded-full border shadow-sm transition-transform hover:scale-110 ${newPreset.box === c.value ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'border-gray-200'}`} style={{ backgroundColor: c.value }} title={c.name}/>
-                                                             ))}
-                                                             <div className="relative group ml-auto">
-                                                                <label className={`w-6 h-6 rounded-full border shadow-sm flex items-center justify-center cursor-pointer overflow-hidden transition-transform hover:scale-110 ${!BOX_THEME_COLORS.find(c => c.value === newPreset.box) ? 'ring-2 ring-offset-1 ring-gray-400 scale-110' : 'border-gray-200'}`} style={{ background: !BOX_THEME_COLORS.find(c => c.value === newPreset.box) ? newPreset.box : 'conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red)' }} title="自訂顏色">
-                                                                    <input type="color" value={newPreset.box} onChange={e => setNewPreset({...newPreset, box: e.target.value})} className="opacity-0 w-full h-full cursor-pointer absolute inset-0" />
-                                                                </label>
-                                                             </div>
-                                                         </div>
+                                                    <div className="col-span-2 border-t pt-3 mt-1">
+                                                        <label className="block text-xs font-bold text-gray-500 mb-2 flex items-center gap-1"><Paintbrush className="w-4 h-4 text-blue-500"/> 自訂顏色細節</label>
+                                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-gray-50/80 border border-gray-200 rounded-lg max-h-[160px] overflow-y-auto custom-scrollbar shadow-inner">
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">外框邊線</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.box || '#FACC15'} onChange={e => setNewPreset({...newPreset, box: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.box || '#FACC15'}</span></div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">抽獎區塊背景</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.boxBg || '#2563EB'} onChange={e => setNewPreset({...newPreset, boxBg: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.boxBg || '#2563EB'}</span></div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">START 按鈕</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.startBtn || '#EAB308'} onChange={e => setNewPreset({...newPreset, startBtn: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.startBtn || '#EAB308'}</span></div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">立即抽獎按鈕</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.drawBtn || '#EAB308'} onChange={e => setNewPreset({...newPreset, drawBtn: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.drawBtn || '#EAB308'}</span></div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">中獎視窗背景</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.modalBg || '#FACC15'} onChange={e => setNewPreset({...newPreset, modalBg: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.modalBg || '#FACC15'}</span></div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">中獎卡片背景</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.cardBg || '#2563EB'} onChange={e => setNewPreset({...newPreset, cardBg: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.cardBg || '#2563EB'}</span></div>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-gray-500 block mb-1">中獎卡片文字</label>
+                                                                <div className="flex items-center gap-2 bg-white p-1 rounded border shadow-sm"><input type="color" value={newPreset.cardText || '#FFFFFF'} onChange={e => setNewPreset({...newPreset, cardText: e.target.value})} className="w-6 h-6 cursor-pointer border-0 p-0 bg-transparent rounded" /><span className="text-[10px] font-mono text-gray-600 uppercase">{newPreset.cardText || '#FFFFFF'}</span></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
