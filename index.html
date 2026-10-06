@@ -579,21 +579,41 @@
             85% { opacity: 0.8; }
             100% { transform: rotate(-30deg); opacity: 0; } /* 回到 -30 度 */
         }
-        .carnival-spotlight {
+        
+        .carnival-spotlight-wrapper {
             position: absolute;
-            bottom: -30vh; /* 稍微往上收，不要拉太長 */
-            width: 80vw;  /* 寬度從 120vw 縮小，讓光束變細 */
-            height: 180vh; /* 高度縮短，不佔滿整個天際 */
-            margin-left: -40vw; /* 配合寬度減半對齊 */
+            bottom: -30vh;
+            width: 80vw;
+            height: 180vh;
+            margin-left: -40vw;
             transform-origin: bottom center;
             mix-blend-mode: screen; 
             z-index: 5;
             /* 提早在 75% 高度強制完全透明，徹底消除頂部直線穿幫 */
             mask-image: linear-gradient(to top, black 0%, black 40%, transparent 75%);
             -webkit-mask-image: linear-gradient(to top, black 0%, black 40%, transparent 75%);
-            /* 加入 3D 加速，強制 Chrome 獨立渲染該圖層 */
+            /* 強制 GPU 硬體加速 */
             transform: translateZ(0);
-            will-change: transform;
+            pointer-events: none;
+        }
+
+        .carnival-spotlight-beam {
+            position: absolute;
+            inset: 0;
+            /* 將光束裁切成錐形 */
+            clip-path: polygon(45% 100%, 55% 100%, 100% 0, 0 0);
+            /* 邊緣柔化光暈 */
+            filter: blur(15px);
+        }
+
+        .carnival-spotlight-core {
+            position: absolute;
+            inset: 0;
+            /* 內部亮白核心，比外層光束更窄 */
+            clip-path: polygon(48% 100%, 52% 100%, 65% 0, 35% 0);
+            background-color: #ffffff;
+            opacity: 0.6;
+            filter: blur(6px);
         }
         
         /* 玩具總動員 (Toy Story) 抽獎動畫 */
@@ -3437,7 +3457,36 @@
                             {bgAnimation === 'carnival' && (
                                 <>
                                     {particleConfig.carnivalSpotlights.map(s => (
-                                        <div key={`spot-${s.id}`} className="carnival-spotlight" style={{ left: s.left, background: `conic-gradient(from 345deg at 50% 100%, rgba(0,0,0,0) 0deg, ${s.color} 10deg, rgba(255,255,255,0.6) 15deg, ${s.color} 20deg, rgba(0,0,0,0) 30deg)`, animation: `spotlight-sweep ${s.duration}s ease-in-out infinite alternate`, animationDelay: `${s.delay}s` }}></div>
+                                        <div key={`spot-${s.id}`} className="carnival-spotlight-wrapper" style={{ left: s.left, animation: `spotlight-sweep ${s.duration}s ease-in-out infinite alternate`, animationDelay: `${s.delay}s` }}>
+                                            {/* 使用 SVG 來繪製探照燈，完美支援模糊與遮罩，100% 避開 Chrome 渲染 Bug */}
+                                            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                                <defs>
+                                                    {/* 從底部(1)到頂部(0)的淡出漸層遮罩 */}
+                                                    <linearGradient id={`fadeGrad-${s.id}`} x1="0" y1="1" x2="0" y2="0">
+                                                        <stop offset="0%" stopColor="white" stopOpacity="1" />
+                                                        <stop offset="40%" stopColor="white" stopOpacity="1" />
+                                                        <stop offset="75%" stopColor="white" stopOpacity="0" />
+                                                    </linearGradient>
+                                                    <mask id={`spotMask-${s.id}`}>
+                                                        <rect width="100" height="100" fill={`url(#fadeGrad-${s.id})`} />
+                                                    </mask>
+                                                    {/* 外層光暈模糊 */}
+                                                    <filter id={`blurBeam-${s.id}`} x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feGaussianBlur stdDeviation="3" />
+                                                    </filter>
+                                                    {/* 內層核心小模糊 */}
+                                                    <filter id={`blurCore-${s.id}`} x="-50%" y="-50%" width="200%" height="200%">
+                                                        <feGaussianBlur stdDeviation="1" />
+                                                    </filter>
+                                                </defs>
+                                                <g mask={`url(#spotMask-${s.id})`}>
+                                                    {/* 外層彩色柔和光束 */}
+                                                    <polygon points="45,100 55,100 100,0 0,0" fill={s.color} filter={`url(#blurBeam-${s.id})`} />
+                                                    {/* 內層高亮白光核心 */}
+                                                    <polygon points="48,100 52,100 65,0 35,0" fill="#ffffff" opacity="0.6" filter={`url(#blurCore-${s.id})`} />
+                                                </g>
+                                            </svg>
+                                        </div>
                                     ))}
                                     {particleConfig.carnivalBalloons.map(b => (
                                         <div key={`balloon-${b.id}`} className="absolute" style={{ left: `${b.left}%`, bottom: '-20vh', animation: `balloon-float ${b.duration}s ease-in-out infinite`, animationDelay: `${b.delay}s` }}>
