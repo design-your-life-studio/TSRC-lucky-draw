@@ -2419,7 +2419,8 @@
                                         <button onClick={onExportBackup} className="flex-1 py-2 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 font-bold flex items-center justify-center gap-2"><Download className="w-4 h-4"/> 匯出備份</button>
                                         <label className="flex-1 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 font-bold flex items-center justify-center gap-2 cursor-pointer">
                                             <Upload className="w-4 h-4"/> 還原備份
-                                            <input type="file" accept="application/json" className="hidden" onChange={onImportBackup} />
+                                            {/* 修正：Mac Chrome 無法選取 json 的問題 (將 application/json 改為 .json，並加入 onClick 清除 value 以防重複選取失效) */}
+                                            <input type="file" accept=".json" className="hidden" onChange={onImportBackup} onClick={(e) => { e.target.value = null; }} />
                                         </label>
                                     </div>
                                 </div>
