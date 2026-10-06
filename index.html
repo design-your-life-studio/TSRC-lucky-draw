@@ -2419,8 +2419,7 @@
                                         <button onClick={onExportBackup} className="flex-1 py-2 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 font-bold flex items-center justify-center gap-2"><Download className="w-4 h-4"/> 匯出備份</button>
                                         <label className="flex-1 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 font-bold flex items-center justify-center gap-2 cursor-pointer">
                                             <Upload className="w-4 h-4"/> 還原備份
-                                            {/* 修正：Mac Chrome 無法選取 json 的問題 (將 application/json 改為 .json，並加入 onClick 清除 value 以防重複選取失效) */}
-                                            <input type="file" accept=".json" className="hidden" onChange={onImportBackup} onClick={(e) => { e.target.value = null; }} />
+                                            <input type="file" accept=".json" className="hidden" onChange={onImportBackup} />
                                         </label>
                                     </div>
                                 </div>
@@ -3251,11 +3250,54 @@
             const resetPrize = (id) => { openConfirm("重置此獎項？", "確定要重置此獎項嗎？該獎項的中獎名單將被清除，中獎者將回到候選池（除非在其他獎項也中獎）。", () => _resetPrizeExec(id)); };
             const _resetPrizeExec = (id) => { const prize = prizes.find(p => p.id === id); const updatedPrizes = prizes.map(p => p.id === id ? { ...p, drawn: false, winners: [] } : p); setPrizes(updatedPrizes); const newGlobalWinners = new Set(); updatedPrizes.forEach(p => { if(p.drawn) p.winners.forEach(w => newGlobalWinners.add(w.id)); }); setGlobalWinners(newGlobalWinners); };
             const handleFullReset = () => { if(!confirm("危險操作！這將清除所有中獎紀錄。")) return; setGlobalWinners(new Set()); setAbsentWinners(new Set()); setPrizes(prizes.map(p => ({ ...p, drawn: false, winners: [] }))); setShowResultModal(false); };
-            const handleFactoryReset = () => { localStorage.removeItem('luckyDrawData_v4'); localStorage.removeItem('luckyDrawData_v3'); location.reload(); };
+            
+            // 使用軟重啟 (Soft Reset) 取代 location.reload()，完美避開 Safari iframe 安全限制
+            const handleFactoryReset = () => { 
+                localStorage.removeItem('luckyDrawData_v4'); 
+                localStorage.removeItem('luckyDrawData_v3'); 
+                setParticipants(generateMockData(1000));
+                setPrizes(defaultPrizes);
+                setGlobalWinners(new Set());
+                setAbsentWinners(new Set());
+                setThemePresets(DEFAULT_PRESETS);
+                setSettings(DEFAULT_SETTINGS);
+                setImportHistory([]);
+                setCurrentPrizeId(defaultPrizes[0].id);
+                alert("已成功恢復原廠設定！所有資料與外觀皆已初始化。");
+            };
             
             const exportToCSV = () => { let csvContent = "\uFEFF獎項名稱,員工編號,姓名,部門,分組\n"; prizes.forEach(prize => { prize.winners.forEach(winner => { csvContent += `${prize.name},${winner.id},${winner.name},${winner.dept},${winner.group || ''}\n`; }); }); const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `中獎名單_${new Date().toISOString().slice(0,10)}.csv`; document.body.appendChild(link); link.click(); document.body.removeChild(link); };
-            const handleExportBackup = () => { const data = localStorage.getItem('luckyDrawData_v4'); if (!data) return alert("目前沒有資料可備份"); const blob = new Blob([data], { type: "application/json" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `LuckyDraw_Backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link); };
-            const handleImportBackup = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const parsed = JSON.parse(event.target.result); if (!parsed.participants || !parsed.prizes) throw new Error("無效的備份檔案"); setPendingBackup(parsed); } catch (err) { alert("檔案格式錯誤或損毀，無法還原"); } }; reader.readAsText(file); e.target.value = ''; };
+            
+            // 強制設定為 octet-stream (二進位流)，避免 Safari 對 JSON 型別的阻擋
+            const handleExportBackup = () => { 
+                const data = localStorage.getItem('luckyDrawData_v4'); 
+                if (!data) return alert("目前沒有資料可備份"); 
+                const blob = new Blob([data], { type: "application/octet-stream" }); 
+                const link = document.createElement("a"); 
+                link.href = URL.createObjectURL(blob); 
+                link.download = `LuckyDraw_Backup_${new Date().toISOString().slice(0,10)}.json`; 
+                document.body.appendChild(link); 
+                link.click(); 
+                document.body.removeChild(link); 
+            };
+            
+            // 將 value 清空的動作移到 onChange 最後，解決 Mac Chrome 檔案選擇器無法彈出的問題
+            const handleImportBackup = (e) => { 
+                const file = e.target.files[0]; 
+                if (!file) return; 
+                const reader = new FileReader(); 
+                reader.onload = (event) => { 
+                    try { 
+                        const parsed = JSON.parse(event.target.result); 
+                        if (!parsed.participants || !parsed.prizes) throw new Error("無效的備份檔案"); 
+                        setPendingBackup(parsed); 
+                    } catch (err) { 
+                        alert("檔案格式錯誤或損毀，無法還原"); 
+                    } 
+                }; 
+                reader.readAsText(file); 
+                e.target.value = ''; 
+            };
             
             const confirmRestoreBackup = () => { 
                 if(!pendingBackup) return; 
