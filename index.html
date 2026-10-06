@@ -585,24 +585,15 @@
             width: 80vw;  /* 寬度從 120vw 縮小，讓光束變細 */
             height: 180vh; /* 高度縮短，不佔滿整個天際 */
             margin-left: -40vw; /* 配合寬度減半對齊 */
-            clip-path: polygon(35% 0, 65% 0, 50.5% 100%, 49.5% 100%); /* 頂部裁切變窄 */
             transform-origin: bottom center;
-            /* 移除 drop-shadow 解決 Chrome 矩形外框渲染 Bug，單純保留 blur 即可 */
-            filter: blur(8px); 
-            pointer-events: none;
             mix-blend-mode: screen; 
             z-index: 5;
-            /* 加入 3D 加速，強制 Chrome 獨立渲染該圖層，解決混合 Bug */
+            /* 提早在 75% 高度強制完全透明，徹底消除頂部直線穿幫 */
+            mask-image: linear-gradient(to top, black 0%, black 40%, transparent 75%);
+            -webkit-mask-image: linear-gradient(to top, black 0%, black 40%, transparent 75%);
+            /* 加入 3D 加速，強制 Chrome 獨立渲染該圖層 */
             transform: translateZ(0);
             will-change: transform;
-        }
-        .carnival-spotlight::after { /* 光束中心的超亮核心 */
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.5) 15%, transparent 60%); /* 提早變透明 */
-            clip-path: polygon(47% 0, 53% 0, 50.2% 100%, 49.8% 100%); /* 核心變更細 */
-            filter: blur(4px);
         }
         
         /* 玩具總動員 (Toy Story) 抽獎動畫 */
