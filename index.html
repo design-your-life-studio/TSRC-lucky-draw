@@ -573,32 +573,32 @@
             100% { transform: translateY(-130vh) rotate(-5deg); opacity: 0; }
         }
         @keyframes spotlight-sweep {
-            0% { transform: rotate(-60deg); opacity: 0; }
-            15% { opacity: 1; }
-            50% { transform: rotate(60deg); opacity: 1; }
-            85% { opacity: 1; }
-            100% { transform: rotate(-60deg); opacity: 0; }
+            0% { transform: rotate(-30deg); opacity: 0; } /* 搖擺幅度縮小為 -30 度 */
+            15% { opacity: 0.8; }
+            50% { transform: rotate(30deg); opacity: 0.8; } /* 搖擺幅度縮小為 30 度 */
+            85% { opacity: 0.8; }
+            100% { transform: rotate(-30deg); opacity: 0; } /* 回到 -30 度 */
         }
         .carnival-spotlight {
             position: absolute;
-            bottom: -40vh; /* 整體大幅下移，確保底部平坦的發射源完全在畫面外 */
-            width: 120vw;  /* 加寬以適應高度增加 */
-            height: 250vh; /* 大幅拉長光束，避免左右搖擺時頂部邊緣穿幫 (破圖) */
-            margin-left: -60vw; /* 寬度的一半，讓光束中心點精準對齊發射源 */
-            clip-path: polygon(30% 0, 70% 0, 51% 100%, 49% 100%); /* 調整裁切比例維持銳利錐形 */
+            bottom: -30vh; /* 稍微往上收，不要拉太長 */
+            width: 80vw;  /* 寬度從 120vw 縮小，讓光束變細 */
+            height: 180vh; /* 高度縮短，不佔滿整個天際 */
+            margin-left: -40vw; /* 配合寬度減半對齊 */
+            clip-path: polygon(35% 0, 65% 0, 50.5% 100%, 49.5% 100%); /* 頂部裁切變窄 */
             transform-origin: bottom center;
-            filter: blur(8px) drop-shadow(0 0 15px rgba(255,255,255,0.5));
+            filter: blur(8px) drop-shadow(0 0 10px rgba(255,255,255,0.3)); /* 降低光暈擴散 */
             pointer-events: none;
-            mix-blend-mode: screen; /* 關鍵：產生夜店光束交錯時的疊加爆亮感 */
+            mix-blend-mode: screen; 
             z-index: 5;
         }
         .carnival-spotlight::after { /* 光束中心的超亮核心 */
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.7) 15%, transparent 70%); /* 配合新高度調整光衰減比例 */
-            clip-path: polygon(46% 0, 54% 0, 50.5% 100%, 49.5% 100%);
-            filter: blur(3px);
+            background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.5) 15%, transparent 60%); /* 提早變透明 */
+            clip-path: polygon(47% 0, 53% 0, 50.2% 100%, 49.8% 100%); /* 核心變更細 */
+            filter: blur(4px);
         }
         
         /* 玩具總動員 (Toy Story) 抽獎動畫 */
@@ -1245,7 +1245,42 @@
                     soundManager.chargeOsc2 = osc2;
                     osc2.start(now);
 
-                    // --- 3 秒高潮爆發：巨型派對銅管和弦 + 拉炮爆裂 (Synth Brass & Noise Crash) ---
+                    // --- 新增：循序漸進的節奏打擊音效 (Progressive Rhythm) ---
+                    let currentTime = 0;
+                    let currentInterval = 350; // 起始節奏較慢 (350ms)
+                    
+                    while (currentTime < 2900) { 
+                        const delay = currentTime;
+                        const progress = currentTime / 3000; 
+                        const beatFreq = 200 + (progress * 600); // 頻率隨時間升高 (200Hz -> 800Hz)，營造緊迫感
+
+                        const timer = setTimeout(() => {
+                            if (!soundManager.chargeOsc) return; // 若中途放開按鈕則取消發聲
+                            const t = soundManager.ctx.currentTime;
+                            const beatOsc = soundManager.ctx.createOscillator();
+                            const beatGain = soundManager.ctx.createGain();
+                            
+                            beatOsc.type = 'sine';
+                            // 快速降頻產生類似電子鼓「咚」的打擊感 (Percussive envelope)
+                            beatOsc.frequency.setValueAtTime(beatFreq, t);
+                            beatOsc.frequency.exponentialRampToValueAtTime(beatFreq * 0.1, t + 0.08); 
+                            
+                            beatGain.gain.setValueAtTime(0.2, t);
+                            beatGain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+                            
+                            beatOsc.connect(beatGain);
+                            beatGain.connect(soundManager.ctx.destination);
+                            beatOsc.start(t);
+                            beatOsc.stop(t + 0.1);
+                            soundManager.trackNode(beatOsc); 
+                        }, delay);
+                        soundManager.drumTimers.push(timer);
+                        
+                        currentTime += currentInterval;
+                        currentInterval = Math.max(45, currentInterval * 0.82); // 每次間隔縮短 (節奏越來越快)，最快 45ms
+                    }
+
+                    // --- 3 秒高潮爆發：巨型派對銅管和弦 (Synth Brass) ---
                     const climaxTime = now + 3.0;
 
                     // A. 巨型派對銅管和弦 (Synth Brass)
@@ -1276,35 +1311,6 @@
                         chordOsc.stop(climaxTime + 2.0);
                         soundManager.trackNode(chordOsc);
                     });
-
-                    // B. 拉炮爆裂的白噪音 (Noise Crash)
-                    const crashDuration = 2.0;
-                    const bufferSize = soundManager.ctx.sampleRate * crashDuration;
-                    const buffer = soundManager.ctx.createBuffer(1, bufferSize, soundManager.ctx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    // 隨機填充產生白噪音
-                    for (let i = 0; i < bufferSize; i++) {
-                        data[i] = Math.random() * 2 - 1;
-                    }
-                    const noise = soundManager.ctx.createBufferSource();
-                    noise.buffer = buffer;
-
-                    // 使用帶通濾波器，模擬紙花拉炮那種帶有「ㄘ」聲的高頻爆裂
-                    const noiseFilter = soundManager.ctx.createBiquadFilter();
-                    noiseFilter.type = 'bandpass';
-                    noiseFilter.frequency.value = 1200;
-                    noiseFilter.Q.value = 0.5;
-
-                    const noiseGain = soundManager.ctx.createGain();
-                    noiseGain.gain.setValueAtTime(0, climaxTime);
-                    noiseGain.gain.linearRampToValueAtTime(0.6, climaxTime + 0.02); // 0.02秒瞬間最大聲
-                    noiseGain.gain.exponentialRampToValueAtTime(0.01, climaxTime + crashDuration); // 跟著銅管一起消散
-
-                    noise.connect(noiseFilter);
-                    noiseFilter.connect(noiseGain);
-                    noiseGain.connect(soundManager.ctx.destination);
-                    noise.start(climaxTime);
-                    soundManager.trackNode(noise);
                 }
                 else if (variant === 'toystory') {
                     duration = 5.0; 
@@ -2787,11 +2793,11 @@
                 // 新增：嘉年華氣球與探照燈生成器
                 const generateBalloons = (count) => [...Array(count)].map((_, i) => ({ id: i, left: Math.random() * 100, duration: 12 + Math.random() * 15, delay: Math.random() * 10, size: 30 + Math.random() * 40, color: ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#A855F7', '#EC4899', '#14B8A6'][Math.floor(Math.random() * 7)] }));
                 const generateSpotlights = () => [ 
-                    { id: 1, left: '15%', duration: 4.2, delay: 0, color: 'rgba(34, 211, 238, 0.6)' },   /* 賽博青 */
-                    { id: 2, left: '35%', duration: 5.8, delay: -2, color: 'rgba(232, 121, 249, 0.6)' },  /* 霓虹粉 */
-                    { id: 3, left: '50%', duration: 4.5, delay: -1, color: 'rgba(255, 255, 255, 0.5)' },   /* 亮白 */
-                    { id: 4, left: '65%', duration: 6.1, delay: -3.5, color: 'rgba(56, 189, 248, 0.6)' }, /* 螢光藍 */
-                    { id: 5, left: '85%', duration: 5.2, delay: -4, color: 'rgba(250, 204, 21, 0.6)' }    /* 耀眼黃 */
+                    { id: 1, left: '15%', duration: 4.2, delay: 0, color: 'rgba(34, 211, 238, 0.4)' },   /* 賽博青 (降低透明度) */
+                    { id: 2, left: '35%', duration: 5.8, delay: -2, color: 'rgba(232, 121, 249, 0.4)' },  /* 霓虹粉 (降低透明度) */
+                    { id: 3, left: '50%', duration: 4.5, delay: -1, color: 'rgba(255, 255, 255, 0.3)' },   /* 亮白 (降低透明度) */
+                    { id: 4, left: '65%', duration: 6.1, delay: -3.5, color: 'rgba(56, 189, 248, 0.4)' }, /* 螢光藍 (降低透明度) */
+                    { id: 5, left: '85%', duration: 5.2, delay: -4, color: 'rgba(250, 204, 21, 0.4)' }    /* 耀眼黃 (降低透明度) */
                 ];
                 
                 // 新增：星空生成器
@@ -3277,7 +3283,7 @@
                             {bgAnimation === 'carnival' && (
                                 <>
                                     {particleConfig.carnivalSpotlights.map(s => (
-                                        <div key={`spot-${s.id}`} className="carnival-spotlight" style={{ left: s.left, background: `linear-gradient(to top, rgba(255,255,255,0.9) 0%, ${s.color} 30%, transparent 80%)`, animation: `spotlight-sweep ${s.duration}s ease-in-out infinite alternate`, animationDelay: `${s.delay}s` }}></div>
+                                        <div key={`spot-${s.id}`} className="carnival-spotlight" style={{ left: s.left, background: `linear-gradient(to top, rgba(255,255,255,0.7) 0%, ${s.color} 25%, transparent 65%)`, animation: `spotlight-sweep ${s.duration}s ease-in-out infinite alternate`, animationDelay: `${s.delay}s` }}></div>
                                     ))}
                                     {particleConfig.carnivalBalloons.map(b => (
                                         <div key={`balloon-${b.id}`} className="absolute" style={{ left: `${b.left}%`, bottom: '-20vh', animation: `balloon-float ${b.duration}s ease-in-out infinite`, animationDelay: `${b.delay}s` }}>
