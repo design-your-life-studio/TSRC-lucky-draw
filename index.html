@@ -1918,6 +1918,7 @@
                                             className="flex-1 text-xs border-none bg-transparent font-bold text-blue-700 focus:ring-0 cursor-pointer hover:bg-blue-100/50 rounded px-1"
                                         >
                                             <option value="all">不限 (所有人員皆可抽)</option>
+                                            {prize.requiredGroup && prize.requiredGroup !== 'all' && !uniqueGroups.includes(prize.requiredGroup) && (<option value={prize.requiredGroup}>{prize.requiredGroup} 僅限（⚠ 目前名單中沒有此組別，請改選「不限」）</option>)}
                                             {uniqueGroups.map(g => (
                                                 <option key={g} value={g}>{g} 僅限</option>
                                             ))}
@@ -3313,7 +3314,7 @@
                 } else { 
                     needed = remaining; 
                 } 
-                if (eligible.length < needed) return alert(`候選人數不足！剩餘 ${eligible.length} 人。`); 
+                if (eligible.length < needed) return alert((() => { const pr = currentPrize; const wonN = participants.filter(p => globalWinners.has(p.id)).length; const absN = participants.filter(p => absentWinners.has(p.id)).length; const exIds = new Set(); (pr.excludedPrizes || []).forEach(eid => { const ep = prizes.find(x => x.id === eid); if (ep) ep.winners.forEach(w => exIds.add(w.id)); }); const grp = (pr.requiredGroup && pr.requiredGroup !== 'all') ? pr.requiredGroup : '不限'; return '候選人數不足！剩餘 ' + eligible.length + ' 人，此次需抽 ' + needed + ' 人。【獎項：' + pr.name + '】名單共 ' + participants.length + ' 人｜已中獎 ' + wonN + ' 人' + (pr.allowRepeat ? '(此獎項允許重複，不扣除)' : '(會被扣除)') + '｜缺席 ' + absN + ' 人' + (pr.allowAbsent ? '(此獎項允許，不扣除)' : '(會被扣除)') + '｜組別限制：' + grp + '｜互斥排除得主 ' + exIds.size + ' 人' + ((grp !== '不限' && !participants.some(p => p.group === grp)) ? '。⚠ 名單中沒有「' + grp + '」組別的人，請到後台此獎項把「限定名單組別」改成「不限」。' : ''); })()); 
                 drawLockRef.current = true; setIsSpinning(true); 
                 setShowResultModal(false); 
                 const duration = 3500; 
